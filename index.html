@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="AEROVA – Understand your air. Protect your health. Urban air quality assistant (frontend demo with sample data)." />
+  <meta name="theme-color" content="#d9ecea" id="themeMeta" />
+  <script>try{if(localStorage.getItem("aerova.theme")==="dark"){document.documentElement.dataset.theme="dark";document.getElementById("themeMeta").content="#0a1220";}}catch(e){}</script>
+  <title>AEROVA – Urban Air Quality Assistant</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230b6e78'/%3E%3Cstop offset='1' stop-color='%23249ba5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='url(%23g)'/%3E%3Cpath d='M8 21c4 0 5-3 8-3s4 3 8 3M8 15c4 0 5-3 8-3s4 3 8 3' stroke='%23ffffff' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Reusable SVG icon sprite (no external icon library) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="i-logo" viewBox="0 0 32 32"><path d="M6 21c4.2 0 5.3-3.4 8.7-3.4S19.8 21 24 21M6 14.6c4.2 0 5.3-3.4 8.7-3.4s4.5 3.4 9.3 3.4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><circle cx="25" cy="8" r="2.4" fill="currentColor"/></symbol>
+      <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+      <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 8h10a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7a2.5 2.5 0 1 1-2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+      <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 3v4M16 3v4M3.5 10h17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-chat" viewBox="0 0 24 24"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-7l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 1 1 12 0v6l1.5 2h-15L6 17zM10 21h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.800 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+      <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2.5-6.5L4 12z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></symbol>
+      <symbol id="i-temp" viewBox="0 0 24 24"><path d="M10 14.5V5a2 2 0 1 1 4 0v9.500a4 4 0 1 1-4 0z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.500 6 11a6 6 0 0 1-12 0c0-4.500 6-11 6-11z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.500-6.500 10-6.500S22 12 22 12s-3.500 6.500-10 6.500S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+      <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18a4.500 4.500 0 0 1-.5-9A6 6 0 0 1 18 10.500 3.800 3.800 0 0 1 17.500 18H7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-rain" viewBox="0 0 24 24"><path d="M7 15a4.2 4.2 0 0 1-.4-8.4A5.6 5.6 0 0 1 17.5 8a3.6 3.6 0 0 1-.4 7H7zM9 18l-1 3M13 18l-1 3M17 18l-1 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="M3.500 11L12 4l8.500 7M6 9.500V20h12V9.500M10 20v-5h4v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-mask" viewBox="0 0 24 24"><path d="M3 9c3-2 6-2.500 9-2.500S18 7 21 9v3c0 4-4 7-9 7s-9-3-9-7V9z M3 11.500h4M17 11.500h4M9 13.500h6M9 16h6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-window" viewBox="0 0 24 24"><rect x="4" y="3.500" width="16" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.500v17M4 12h16" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+      <symbol id="i-run" viewBox="0 0 24 24"><circle cx="15" cy="5" r="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 20l3-5-2.500-2.500 2-4 3 1.500 2.500 2M7 11l3-3M12 15l3 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-plant" viewBox="0 0 24 24"><path d="M12 21v-8M12 13c-4 0-6-2.500-6-6 4 0 6 2 6 6zM12 15c0-3.500 2-5.500 6-5.500 0 3.500-2 5.500-6 5.500zM8 21h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.500v2.500M12 19v2.500M2.500 12H5M19 12h2.500M5.300 5.300l1.800 1.800M16.900 16.900l1.800 1.800M5.300 18.700l1.800-1.800M16.900 7.100l1.800-1.800" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.500A8 8 0 0 1 9.500 4a8 8 0 1 0 10.500 10.500z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-bus" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="13" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 11h16M7 20v-3M17 20v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M4 9h12v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V9zM16 10h2a2.500 2.500 0 0 1 0 5h-2M7 3v3M11 3v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 7.500v.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.500" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l4.500 4.500" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.500" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M12 2.500v3M12 18.500v3M2.500 12h3M18.500 12h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="app" id="app">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+      <div class="sidebar__top">
+        <a class="brand" href="#overview" data-nav-link>
+          <span class="brand__mark"><svg class="icon"><use href="#i-logo"/></svg></span>
+          <span class="brand__text">
+            <span class="brand__name">AEROVA</span>
+            <span class="brand__sub">Air Intelligence</span>
+          </span>
+        </a>
+        <button class="icon-btn sidebar__close" id="menuClose" aria-label="Close menu" type="button">
+          <svg class="icon"><use href="#i-close"/></svg>
+        </button>
+      </div>
+
+      <nav class="nav" id="nav">
+        <p class="nav__label">Dashboard</p>
+        <a class="nav__link is-active" href="#overview" data-nav-link data-title="Overview">
+          <svg class="icon"><use href="#i-grid"/></svg><span>Overview</span>
+        </a>
+        <a class="nav__link" href="#air-quality" data-nav-link data-title="Air Quality">
+          <svg class="icon"><use href="#i-wind"/></svg><span>Air Quality</span>
+        </a>
+        <a class="nav__link" href="#recommendations" data-nav-link data-title="AI Recommendations">
+          <svg class="icon"><use href="#i-spark"/></svg><span>AI Recommendations</span>
+        </a>
+        <a class="nav__link" href="#planner" data-nav-link data-title="Daily Planner">
+          <svg class="icon"><use href="#i-cal"/></svg><span>Daily Planner</span>
+        </a>
+        <a class="nav__link" href="#assistant" data-nav-link data-title="AI Assistant">
+          <svg class="icon"><use href="#i-chat"/></svg><span>AI Assistant</span>
+        </a>
+      </nav>
+
+      <div class="sidebar__bottom">
+        <div class="demo-note" id="demoNote">
+          <svg class="icon"><use href="#i-info"/></svg>
+          <p id="demoNoteText">Demo build. All readings are <strong>sample data</strong>, not live measurements.</p>
+        </div>
+        <button class="profile" type="button" id="profileBtn" aria-label="User profile">
+          <span class="avatar" aria-hidden="true">BwM</span>
+          <span class="profile__text">
+            <span class="profile__name">Build with Musab</span>
+            <span class="profile__meta">Developer</span>
+          </span>
+        </button>
+      </div>
+    </aside>
+
+    <div class="scrim" id="scrim" hidden></div>
+
+    <!-- ============ MAIN ============ -->
+    <div class="content">
+
+      <header class="topbar" id="topbar">
+        <button class="icon-btn menu-toggle" id="menuToggle" type="button" aria-label="Open menu" aria-controls="sidebar" aria-expanded="false">
+          <svg class="icon"><use href="#i-menu"/></svg>
+        </button>
+
+        <h1 class="topbar__title" id="pageTitle">Overview</h1>
+
+        <div class="topbar__actions">
+          <span class="chip chip--demo" id="dataChip" title="Data source status">
+            <span class="chip__dot"></span><span class="chip__full" id="chipFull">Demo data</span><span class="chip__short" id="chipShort">Demo</span>
+          </span>
+
+          <div class="dropdown dropdown--right" id="locationDropdown">
+            <button class="select-btn" id="locationBtn" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <svg class="icon"><use href="#i-pin"/></svg>
+              <span id="locationLabel">New Delhi</span>
+              <svg class="icon icon--sm chev"><use href="#i-chev"/></svg>
+            </button>
+            <div class="dropdown__menu loc-panel" id="locationMenu" hidden>
+              <form class="loc-search" id="locSearchForm" role="search">
+                <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+                <input id="locSearch" type="search" placeholder="Search any city…" autocomplete="off" autocapitalize="words" spellcheck="false" aria-label="Search for a city" />
+              </form>
+              <button class="loc-track" id="trackBtn" type="button">
+                <svg class="icon" aria-hidden="true"><use href="#i-target"/></svg>
+                <span><strong id="trackLabel">Use my current location</strong><small>Your browser will ask for permission. Used only when you click.</small></span>
+              </button>
+              <div class="loc-lists" id="locLists">
+                <div class="loc-group" id="recentGroup">
+                  <div class="loc-heading-row">
+                    <p class="loc-heading" id="recentHeading">Recently searched</p>
+                    <button class="link-btn loc-clear" id="clearRecent" type="button" hidden>Clear</button>
+                  </div>
+                  <ul class="loc-list" id="recentList" role="listbox" aria-label="Recently searched cities" hidden></ul>
+                  <p class="loc-empty loc-empty--muted" id="recentEmpty">Your recent city searches will appear here.</p>
+                </div>
+                <p class="loc-heading" id="locHeading">Suggested cities</p>
+                <ul class="loc-list" id="locList" role="listbox" aria-label="Cities">
+                <li data-city="New Delhi" data-lat="28.6139" data-lon="77.2090" data-country="India" data-region="National Capital Territory" aria-selected="true">New Delhi, India</li>
+                <li data-city="Mumbai" data-lat="19.0760" data-lon="72.8777" data-country="India" data-region="Maharashtra">Mumbai, India</li>
+                <li data-city="Bengaluru" data-lat="12.9716" data-lon="77.5946" data-country="India" data-region="Karnataka">Bengaluru, India</li>
+                <li data-city="Kolkata" data-lat="22.5726" data-lon="88.3639" data-country="India" data-region="West Bengal">Kolkata, India</li>
+                <li data-city="Lahore" data-lat="31.5204" data-lon="74.3587" data-country="Pakistan" data-region="Punjab">Lahore, Pakistan</li>
+                <li data-city="Beijing" data-lat="39.9042" data-lon="116.4074" data-country="China" data-region="Beijing Municipality">Beijing, China</li>
+                </ul>
+                <p class="loc-empty" id="locEmpty" role="status" hidden></p>
+              </div>
+            </div>
+          </div>
+
+          <button class="icon-btn theme-btn" id="themeToggle" type="button" aria-label="Switch to dark theme" title="Switch to dark theme" aria-pressed="false">
+            <svg class="icon" aria-hidden="true"><use id="themeIconUse" href="#i-moon"/></svg>
+          </button>
+
+          <div class="dropdown dropdown--right" id="notifDropdown">
+            <button class="icon-btn notif-btn" id="notifBtn" type="button" aria-label="Notifications (3 unread)" aria-haspopup="true" aria-expanded="false">
+              <svg class="icon"><use href="#i-bell"/></svg>
+              <span class="notif-badge" id="notifBadge">3</span>
+            </button>
+            <div class="dropdown__menu notif-panel" id="notifPanel" hidden>
+              <div class="notif-panel__head">
+                <strong>Notifications</strong>
+                <button class="link-btn" id="markRead" type="button">Mark all read</button>
+              </div>
+              <ul class="notif-list" id="notifList"></ul>
+              <p class="notif-panel__foot" id="notifFoot">Notifications are demonstration content.</p>
+            </div>
+          </div>
+
+          <button class="avatar avatar--btn" type="button" id="avatarBtn" aria-label="Open profile">BwM</button>
+        </div>
+      </header>
+
+      <main id="main" tabindex="-1">
+
+        <!-- ============ OVERVIEW ============ -->
+        <section class="section section--hero" id="overview" data-section data-title="Overview" aria-labelledby="hero-title">
+          <div class="hero">
+            <div class="hero__glow" aria-hidden="true"></div>
+            <div class="hero__copy">
+              <span class="eyebrow"><svg class="icon icon--sm"><use href="#i-logo"/></svg> AEROVA · Urban Air Quality Assistant</span>
+              <h2 class="hero__title" id="hero-title">Understand your air.<br /><span class="grad-text">Protect your health.</span></h2>
+              <p class="hero__lead">Your personal companion for smarter decisions in an increasingly polluted world.</p>
+              <div class="hero__cta">
+                <a class="btn btn--primary" href="#air-quality" data-nav-link>View air quality</a>
+                <a class="btn btn--ghost" href="#assistant" data-nav-link>Ask the assistant</a>
+              </div>
+            </div>
+
+            <article class="loc-card glass" aria-label="Current location">
+              <div class="loc-card__head">
+                <span class="loc-card__icon"><svg class="icon"><use href="#i-pin"/></svg></span>
+                <span class="tag tag--sample" data-source-tag>Sample data</span>
+              </div>
+              <p class="loc-card__label">Current location</p>
+              <h3 class="loc-card__city" id="locCity">New Delhi</h3>
+              <p class="loc-card__country" id="locCountry">India</p>
+              <dl class="loc-card__meta">
+                <div><dt>Region</dt><dd id="locRegion">National Capital Territory</dd></div>
+                <div><dt>Updated</dt><dd id="locTime">—</dd></div>
+              </dl>
+            </article>
+          </div>
+
+          <div class="grid grid--overview">
+            <!-- AQI overview -->
+            <article class="card aqi-card" aria-labelledby="aqi-title">
+              <div class="card__head">
+                <h3 id="aqi-title" class="card__title">Air Quality Index</h3>
+                <span class="tag tag--sample" data-source-tag>Sample data</span>
+              </div>
+
+              <div class="aqi-card__body">
+                <div class="gauge" id="gauge" role="img" aria-label="AQI 164 out of 500, Unhealthy">
+                  <svg viewBox="0 0 200 200" aria-hidden="true">
+                    <defs>
+                      <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#f59e0b"/>
+                        <stop offset="100%" stop-color="#f97316"/>
+                      </linearGradient>
+                    </defs>
+                    <circle class="gauge__track" cx="100" cy="100" r="84" />
+                    <circle class="gauge__value" id="gaugeValue" cx="100" cy="100" r="84" />
+                  </svg>
+                  <div class="gauge__center">
+                    <span class="gauge__num" id="aqiNumber" data-target="164">0</span>
+                    <span class="gauge__max">/ 500</span>
+                  </div>
+                </div>
+
+                <div class="aqi-card__info">
+                  <span class="status-pill" id="aqiPill"><span class="dot"></span><span id="aqiLabel">Unhealthy</span></span>
+                  <dl class="kv">
+                    <div><dt>Primary pollutant</dt><dd id="aqiPrimary">PM2.5</dd></div>
+                    <div><dt>Scale</dt><dd>0 – 500</dd></div>
+                  </dl>
+                  <p class="aqi-card__text" id="aqiText">At AQI 164, everyone may begin to experience health effects, and sensitive groups may experience more serious effects. Limit prolonged outdoor exertion.</p>
+                </div>
+              </div>
+
+              <div class="aqi-scale" aria-label="AQI category scale">
+                <div class="aqi-scale__bar" id="aqiScale">
+                  <span class="aqi-scale__seg" style="--w:10%;--c:var(--aq-good)" title="0–50 Good"></span>
+                  <span class="aqi-scale__seg" style="--w:10%;--c:var(--aq-moderate)" title="51–100 Moderate"></span>
+                  <span class="aqi-scale__seg" style="--w:10%;--c:var(--aq-sensitive)" title="101–150 Unhealthy for Sensitive Groups"></span>
+                  <span class="aqi-scale__seg" style="--w:10%;--c:var(--aq-unhealthy)" title="151–200 Unhealthy"></span>
+                  <span class="aqi-scale__seg" style="--w:20%;--c:var(--aq-very)" title="201–300 Very Unhealthy"></span>
+                  <span class="aqi-scale__seg" style="--w:40%;--c:var(--aq-hazard)" title="301–500 Hazardous"></span>
+                  <span class="aqi-scale__marker" id="scaleMarker" style="left:0%"><span>164</span></span>
+                </div>
+                <ul class="legend">
+                  <li><i style="background:var(--aq-good)"></i>Good <small>0–50</small></li>
+                  <li><i style="background:var(--aq-moderate)"></i>Moderate <small>51–100</small></li>
+                  <li><i style="background:var(--aq-sensitive)"></i>Sensitive <small>101–150</small></li>
+                  <li><i style="background:var(--aq-unhealthy)"></i>Unhealthy <small>151–200</small></li>
+                  <li><i style="background:var(--aq-very)"></i>Very unhealthy <small>201–300</small></li>
+                  <li><i style="background:var(--aq-hazard)"></i>Hazardous <small>301+</small></li>
+                </ul>
+              </div>
+            </article>
+
+            <!-- Weather -->
+            <article class="card weather-card" aria-labelledby="wx-title">
+              <div class="card__head">
+                <h3 id="wx-title" class="card__title">Weather</h3>
+                <span class="tag tag--sample" data-source-tag>Sample data</span>
+              </div>
+              <div class="weather-card__main">
+                <span class="weather-card__icon"><svg class="icon icon--xl" aria-hidden="true"><use id="wxIconUse" href="#i-cloud"/></svg></span>
+                <div>
+                  <p class="weather-card__temp"><span id="wxTemp">29</span>°<small>C</small></p>
+                  <p class="weather-card__cond" id="wxCond">Hazy · Partly cloudy</p>
+                </div>
+              </div>
+              <ul class="wx-grid">
+                <li><svg class="icon"><use href="#i-temp"/></svg><div><span>Feels like</span><strong id="wxFeels">29 °C</strong></div></li>
+                <li><svg class="icon"><use href="#i-drop"/></svg><div><span>Humidity</span><strong id="wxHum">58 %</strong></div></li>
+                <li><svg class="icon"><use href="#i-wind"/></svg><div><span>Wind speed</span><strong id="wxWind">9 km/h</strong></div></li>
+                <li><svg class="icon"><use href="#i-eye"/></svg><div><span>Visibility</span><strong id="wxVis">3.2 km</strong></div></li>
+                <li class="wx-grid__wide"><svg class="icon"><use href="#i-rain"/></svg><div><span>Chance of rain</span><strong id="wxRain">15 %</strong></div></li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- ============ AIR QUALITY ============ -->
+        <section class="section" id="air-quality" data-section data-title="Air Quality" aria-labelledby="aq-title">
+          <header class="section__head">
+            <div>
+              <h2 class="section__title" id="aq-title">Pollutant monitoring</h2>
+              <p class="section__sub">Six key pollutants. The bar shows each pollutant's AQI sub-index (US EPA scale, 0–200).</p>
+            </div>
+            <span class="tag tag--sample" data-source-tag>Sample data</span>
+          </header>
+
+          <div class="grid grid--pollutants" id="pollutantGrid" aria-live="polite"><!-- rendered by script.js --></div>
+
+          <article class="card trend-card" aria-labelledby="trend-title">
+            <div class="card__head card__head--wrap">
+              <div>
+                <h3 class="card__title" id="trend-title">AQI trend · last 24 hours</h3>
+                <p class="card__sub">Hourly readings. Hover, tap or use arrow keys on a bar for details.</p>
+              </div>
+              <div class="trend-controls">
+                <span class="tag tag--sample" data-source-tag>Sample data</span>
+                <div class="segmented" role="group" aria-label="Chart range">
+                  <button type="button" class="is-active" data-range="24">24h</button>
+                  <button type="button" data-range="12">12h</button>
+                  <button type="button" data-range="6">6h</button>
+                </div>
+              </div>
+            </div>
+            <div class="chart" id="trendChart" role="group" aria-label="Hourly AQI bar chart (sample data)">
+              <div class="chart__tooltip" id="chartTip" hidden></div>
+              <div class="chart__plot" id="chartPlot"><!-- bars --></div>
+            </div>
+            <ul class="legend legend--inline">
+              <li><i style="background:var(--aq-good)"></i>Good</li>
+              <li><i style="background:var(--aq-moderate)"></i>Moderate</li>
+              <li><i style="background:var(--aq-sensitive)"></i>Sensitive</li>
+              <li><i style="background:var(--aq-unhealthy)"></i>Unhealthy</li>
+              <li><i style="background:var(--aq-very)"></i>Very unhealthy</li>
+            </ul>
+          </article>
+        </section>
+
+        <!-- ============ RECOMMENDATIONS ============ -->
+        <section class="section" id="recommendations" data-section data-title="AI Recommendations" aria-labelledby="rec-title">
+          <header class="section__head">
+            <div>
+              <h2 class="section__title" id="rec-title">AI recommendations</h2>
+              <p class="section__sub">Personalised guidance for today's air.</p>
+            </div>
+            <span class="tag tag--demo" id="recoTag">Demonstration content</span>
+          </header>
+
+          <p class="notice"><svg class="icon"><use href="#i-info"/></svg><span id="recoNotice">These recommendations are static demonstration content. No recommendation engine is connected yet.</span></p>
+
+          <div class="grid grid--reco" id="recoGrid"><!-- rendered by script.js --></div>
+        </section>
+
+        <!-- ============ PLANNER ============ -->
+        <section class="section" id="planner" data-section data-title="Daily Planner" aria-labelledby="plan-title">
+          <header class="section__head">
+            <div>
+              <h2 class="section__title" id="plan-title">Smart daily planner</h2>
+              <p class="section__sub">A sample day arranged around the expected air quality.</p>
+            </div>
+            <span class="tag tag--demo" id="planTag">Demonstration content</span>
+          </header>
+
+          <ol class="timeline" id="timeline"><!-- rendered by script.js --></ol>
+        </section>
+
+        <!-- ============ ASSISTANT ============ -->
+        <section class="section" id="assistant" data-section data-title="AI Assistant" aria-labelledby="chat-title">
+          <header class="section__head">
+            <div>
+              <h2 class="section__title" id="chat-title">AI assistant</h2>
+              <p class="section__sub">Ask about air quality, health and your day.</p>
+            </div>
+            <span class="tag tag--demo">Rule-based replies</span>
+          </header>
+
+          <div class="chat card">
+            <div class="chat__bar">
+              <span class="bot-avatar" aria-hidden="true"><svg class="icon"><use href="#i-logo"/></svg></span>
+              <div>
+                <strong>AEROVA Assistant</strong>
+                <small><span class="status-dot"></span>Rule-based · no AI model connected</small>
+              </div>
+            </div>
+
+            <div class="chat__log" id="chatLog" role="log" aria-live="polite" aria-label="Conversation"></div>
+
+            <div class="chat__suggest" id="chatSuggest" aria-label="Suggested questions">
+              <button type="button" class="suggest" data-q="Is it safe to go outside today?">Is it safe to go outside today?</button>
+              <button type="button" class="suggest" data-q="How can I improve indoor air quality?">How can I improve indoor air quality?</button>
+              <button type="button" class="suggest" id="suggestAqi" data-q="What does AQI 164 mean?">What does AQI 164 mean?</button>
+            </div>
+
+            <form class="chat__form" id="chatForm" autocomplete="off">
+              <label class="sr-only" for="chatInput">Type your question</label>
+              <input class="chat__input" id="chatInput" type="text" placeholder="Ask about today's air…" maxlength="300" enterkeyhint="send" />
+              <button class="btn btn--primary btn--send" type="submit" aria-label="Send message">
+                <svg class="icon"><use href="#i-send"/></svg><span>Send</span>
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <p><strong>AEROVA</strong> · Understand your air. Protect your health.</p>
+          <p id="footNote">Frontend demo. All readings, alerts, recommendations and chat replies are sample content, not live data or medical advice.</p>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>
