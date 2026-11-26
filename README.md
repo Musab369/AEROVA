@@ -4,7 +4,7 @@ Weather insights. Beautifully delivered.
 
 AEROVA is a modern, responsive weather platform that brings real-time weather information, forecasts, and air quality insights together in a clean and intuitive interface.
 
-🔗 Live Website: "Visit AEROVA" (https://aerova-app.vercel.app/)
+🔗 Live Website: "Visit AEROVA" https://aerova-app.vercel.app/
 
 ---
 
@@ -28,7 +28,7 @@ Whether you're checking the temperature, exploring forecasts, or monitoring air 
 
 Explore the live version:
 
-👉 "AEROVA — Live Website" (https://aerova-app.vercel.app/)
+👉 "AEROVA — Live Website" https://aerova-app.vercel.app/
 
 🛠️ Built With
 
