@@ -60,7 +60,7 @@ AEROVA/
 
 1. Clone the repository
 
-git clone https://github.com/YOUR-USERNAME/AEROVA.git
+git clone https://github.com/Musab369/AEROVA.git
 
 2. Enter the project directory
 
