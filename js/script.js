@@ -402,13 +402,25 @@
     sug.dataset.q = q;
   }
 
-  /* ---- Location card ---- */
+  /* ---- Location card & Commercial Header ---- */
   function renderLocation() {
     const d = state.data;
-    $("#locCity").textContent = state.city.city;
-    $("#locCountry").textContent = state.city.country;
-    $("#locRegion").textContent = state.city.region;
-    $("#locTime").textContent = fmtClock(d.updated) + (isLive() ? " (local)" : " (sample)");
+    const city = state.city;
+    if ($("#locCity")) $("#locCity").textContent = city.city;
+    if ($("#locCountry")) $("#locCountry").textContent = city.country;
+    if ($("#locRegion")) $("#locRegion").textContent = city.region;
+    if ($("#locTime")) $("#locTime").textContent = fmtClock(d.updated) + (isLive() ? " (local)" : " (sample)");
+
+    // Commercial Header & Breadcrumbs
+    if ($("#crumbCity")) $("#crumbCity").textContent = city.city;
+    if ($("#crumbRegion")) $("#crumbRegion").textContent = city.region || "Region";
+    if ($("#crumbCountry")) $("#crumbCountry").textContent = city.country || "Country";
+    if ($("#pageCityTitle")) $("#pageCityTitle").textContent = city.city;
+    if ($("#pageCitySub")) $("#pageCitySub").textContent = city.city;
+    if ($("#mapCityPin")) $("#mapCityPin").textContent = city.city;
+
+    const timeStr = d.updated ? d.updated.toISOString().slice(0, 10) + " " + fmtClock(d.updated) : "Just now";
+    if ($("#mainUpdatedTime")) $("#mainUpdatedTime").textContent = timeStr;
   }
 
   /* ---- AQI card ---- */
@@ -432,24 +444,48 @@
     const gauge = $("#gaugeValue");
     const marker = $("#scaleMarker");
 
-    gauge.style.strokeDasharray = circ.toFixed(1);
-    gauge.style.stroke = band.color;
-    gauge.style.filter = "drop-shadow(0 0 10px color-mix(in srgb, " + band.color + " 55%, transparent))";
+    if (gauge) {
+      gauge.style.strokeDasharray = circ.toFixed(1);
+      gauge.style.stroke = band.color;
+      gauge.style.filter = "drop-shadow(0 0 10px color-mix(in srgb, " + band.color + " 55%, transparent))";
+    }
     // double rAF so the CSS transition runs even on the first render
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      gauge.style.strokeDashoffset = (circ * (1 - ratio)).toFixed(1);
-      marker.style.left = (ratio * 100).toFixed(1) + "%";
+      if (gauge) gauge.style.strokeDashoffset = (circ * (1 - ratio)).toFixed(1);
+      if (marker) marker.style.left = (ratio * 100).toFixed(1) + "%";
     }));
-    marker.firstElementChild.textContent = d.aqi;
+    if (marker && marker.firstElementChild) marker.firstElementChild.textContent = d.aqi;
 
     countUp($("#aqiNumber"), state.shownAqi, d.aqi, 1300);
     state.shownAqi = d.aqi;
 
-    $("#aqiPill").style.setProperty("--pill-c", band.color);
-    $("#aqiLabel").textContent = band.label;
+    const aqiPill = $("#aqiPill");
+    if (aqiPill) {
+      aqiPill.style.setProperty("--pill-c", band.color);
+      $("#aqiLabel").textContent = band.label;
+    }
+    const heroCard = $("#megaHeroCard");
+    if (heroCard) {
+      heroCard.style.setProperty("--hero-ambient", "color-mix(in srgb, " + band.color + " 22%, transparent)");
+      heroCard.style.setProperty("--pill-c", band.color);
+    }
+
+    if ($("#heroPm25Val") && d.components && d.components.pm2_5 != null) {
+      $("#heroPm25Val").textContent = d.components.pm2_5.toFixed(1) + " µg/m³";
+    }
+    if ($("#heroPm10Val") && d.components && d.components.pm10 != null) {
+      $("#heroPm10Val").textContent = Math.round(d.components.pm10) + " µg/m³";
+    }
+
+    if ($("#mapSensorCenter")) {
+      $("#mapSensorCenter").style.setProperty("--val", "'" + d.aqi + "'");
+      $("#mapSensorCenter").style.setProperty("--pill-c", band.color);
+    }
+
     $("#aqiPrimary").textContent = POLLUTANTS.find((p) => p.key === d.primary).name;
     $("#aqiText").textContent = "At AQI " + d.aqi + ": " + band.health;
-    $("#gauge").setAttribute("aria-label", "AQI " + d.aqi + " out of 500, " + band.label);
+    const gaugeEl = $("#gauge");
+    if (gaugeEl) gaugeEl.setAttribute("aria-label", "AQI " + d.aqi + " out of 500, " + band.label);
   }
 
   /* ---- Weather card ---- */
@@ -487,6 +523,7 @@
       const pct = Math.min(100, Math.round((sub / 200) * 100));
 
       const card = el("article", "card pol pol--" + status + (first ? " reveal" : ""));
+      card.dataset.pol = p.key;
       card.setAttribute("aria-label", p.name + " " + fmtValue(value) + " " + p.unit + ", " + STATUS_LABEL[status]);
 
       const top = el("div", "pol__top");
@@ -1329,6 +1366,80 @@
     setTimeout(fire, 2500);
   }
 
+  function initProDashboard() {
+    // Header "Locate me" button triggers the location tracker
+    const headerLocate = $("#headerLocateBtn");
+    const track = $("#trackBtn");
+    if (headerLocate && track) {
+      headerLocate.addEventListener("click", () => track.click());
+    }
+
+    // Favorite button
+    const favBtn = $("#favoriteBtn");
+    if (favBtn) {
+      favBtn.addEventListener("click", () => {
+        favBtn.classList.toggle("is-active");
+        const active = favBtn.classList.contains("is-active");
+        favBtn.style.color = active ? "#ef4444" : "";
+        toast(active ? state.city.city + " saved to your favorites." : "Removed from favorites.");
+      });
+    }
+
+    // Share button
+    const shareBtn = $("#shareBtn");
+    if (shareBtn) {
+      shareBtn.addEventListener("click", () => {
+        if (navigator.share) {
+          navigator.share({
+            title: state.city.city + " Air Quality Index | AEROVA",
+            text: "Current AQI in " + state.city.city + " is " + (state.data ? state.data.aqi : "164") + ".",
+            url: window.location.href
+          }).catch(() => {});
+        } else {
+          navigator.clipboard.writeText(window.location.href).then(() => {
+            toast("Dashboard link copied to clipboard!");
+          }).catch(() => {
+            toast("Shareable link: " + window.location.href);
+          });
+        }
+      });
+    }
+
+    // Filter pills (AQI, History, PM2.5, PM10, etc.)
+    const pills = $$("#paramPills .filter-pill");
+    pills.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        pills.forEach((p) => p.classList.remove("is-active"));
+        btn.classList.add("is-active");
+        const param = btn.dataset.param;
+        if (param === "aqi") {
+          window.location.hash = "overview";
+        } else if (param === "history") {
+          window.location.hash = "air-quality";
+          const trend = $("#trendChart");
+          if (trend) trend.scrollIntoView({ behavior: "smooth" });
+        } else {
+          window.location.hash = "air-quality";
+          const targetCard = $('[data-pol="' + param + '"]');
+          if (targetCard) {
+            targetCard.scrollIntoView({ behavior: "smooth", block: "center" });
+            targetCard.style.outline = "2px solid #0284c7";
+            setTimeout(() => { targetCard.style.outline = ""; }, 1800);
+          }
+        }
+      });
+    });
+
+    // Weather view switcher
+    const toggleWeather = $("#toggleWeatherView");
+    if (toggleWeather) {
+      toggleWeather.addEventListener("click", () => {
+        const capsule = $("#heroWeatherCapsule");
+        if (capsule) capsule.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    }
+  }
+
   /* ---------------------------------------------------------
      10. BOOT
      --------------------------------------------------------- */
@@ -1341,6 +1452,7 @@
     initNotifications();
     initProfile();
     initChart();
+    initProDashboard();
 
     // 1) Show labelled sample data immediately, 2) swap to live data when it arrives
     state.data = buildSample();

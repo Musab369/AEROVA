@@ -7,6 +7,9 @@
   <meta name="theme-color" content="#d9ecea" id="themeMeta" />
   <script>try{if(localStorage.getItem("aerova.theme")==="dark"){document.documentElement.dataset.theme="dark";document.getElementById("themeMeta").content="#0a1220";}}catch(e){}</script>
   <title>AEROVA – Urban Air Quality Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230b6e78'/%3E%3Cstop offset='1' stop-color='%23249ba5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='url(%23g)'/%3E%3Cpath d='M8 21c4 0 5-3 8-3s4 3 8 3M8 15c4 0 5-3 8-3s4 3 8 3' stroke='%23ffffff' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -20,7 +23,7 @@
       <symbol id="i-logo" viewBox="0 0 32 32"><path d="M6 21c4.2 0 5.3-3.4 8.7-3.4S19.8 21 24 21M6 14.6c4.2 0 5.3-3.4 8.7-3.4s4.5 3.4 9.3 3.4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><circle cx="25" cy="8" r="2.4" fill="currentColor"/></symbol>
       <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
       <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 8h10a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7a2.5 2.5 0 1 1-2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-      <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+      <symbol id="i-spark" viewBox="0 0 24 24">< d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
       <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 3v4M16 3v4M3.5 10h17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-chat" viewBox="0 0 24 24"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-7l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
       <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 1 1 12 0v6l1.5 2h-15L6 17zM10 21h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
@@ -47,6 +50,8 @@
       <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.500" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l4.500 4.500" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.500" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M12 2.500v3M12 18.500v3M2.500 12h3M18.500 12h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-share" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     </defs>
   </svg>
 
@@ -181,114 +186,208 @@
 
       <main id="main" tabindex="-1">
 
-        <!-- ============ OVERVIEW ============ -->
-        <section class="section section--hero" id="overview" data-section data-title="Overview" aria-labelledby="hero-title">
-          <div class="hero">
-            <div class="hero__glow" aria-hidden="true"></div>
-            <div class="hero__copy">
-              <span class="eyebrow"><svg class="icon icon--sm"><use href="#i-logo"/></svg> AEROVA · Urban Air Quality Assistant</span>
-              <h2 class="hero__title" id="hero-title">Understand your air.<br /><span class="grad-text">Protect your health.</span></h2>
-              <p class="hero__lead">Your personal companion for smarter decisions in an increasingly polluted world.</p>
-              <div class="hero__cta">
-                <a class="btn btn--primary" href="#air-quality" data-nav-link>View air quality</a>
-                <a class="btn btn--ghost" href="#assistant" data-nav-link>Ask the assistant</a>
-              </div>
-            </div>
+        <!-- ============ OVERVIEW (PRO COMMERCIAL DASHBOARD) ============ -->
+        <section class="section section--overview" id="overview" data-section data-title="Overview" aria-labelledby="mainCityTitle">
+          
+          <!-- Breadcrumb Navigation -->
+          <nav class="pro-breadcrumbs" aria-label="Breadcrumb">
+            <span class="crumb"><svg class="icon icon--sm"><use href="#i-home"/></svg> Dashboard</span>
+            <span class="crumb-sep">›</span>
+            <span class="crumb" id="crumbCountry">India</span>
+            <span class="crumb-sep">›</span>
+            <span class="crumb" id="crumbRegion">National Capital Territory</span>
+            <span class="crumb-sep">›</span>
+            <span class="crumb crumb--active" id="crumbCity">New Delhi</span>
+          </nav>
 
-            <article class="loc-card glass" aria-label="Current location">
-              <div class="loc-card__head">
-                <span class="loc-card__icon"><svg class="icon"><use href="#i-pin"/></svg></span>
-                <span class="tag tag--sample" data-source-tag>Sample data</span>
+          <!-- Main Page Header & Meta Row -->
+          <div class="page-meta-row">
+            <div class="page-meta-left">
+              <div class="live-pulse-badge">
+                <span class="live-dot"></span> LIVE
               </div>
-              <p class="loc-card__label">Current location</p>
-              <h3 class="loc-card__city" id="locCity">New Delhi</h3>
-              <p class="loc-card__country" id="locCountry">India</p>
-              <dl class="loc-card__meta">
-                <div><dt>Region</dt><dd id="locRegion">National Capital Territory</dd></div>
-                <div><dt>Updated</dt><dd id="locTime">—</dd></div>
-              </dl>
-            </article>
+              <h1 class="main-page-title" id="mainCityTitle"><span id="pageCityTitle">New Delhi</span> Air Quality Index (AQI) | Air Pollution</h1>
+              <p class="main-page-sub">Real-time PM2.5, PM10 air pollution level in <span id="pageCitySub">New Delhi</span></p>
+              <p class="main-page-updated">Last Updated: <span id="mainUpdatedTime">2026-11-27 23:01</span> (Local Time)</p>
+            </div>
+            <div class="page-meta-actions">
+              <button class="btn-pill-action" id="headerLocateBtn" type="button" aria-label="Locate me">
+                <svg class="icon icon--sm"><use href="#i-target"/></svg>
+                <span>Locate me</span>
+              </button>
+              <button class="icon-circle-btn" id="favoriteBtn" type="button" aria-label="Save to favorites" title="Favorite">
+                <svg class="icon icon--sm"><use href="#i-heart"/></svg>
+              </button>
+              <button class="icon-circle-btn" id="shareBtn" type="button" aria-label="Share" title="Share page">
+                <svg class="icon icon--sm"><use href="#i-share"/></svg>
+              </button>
+            </div>
           </div>
 
-          <div class="grid grid--overview">
-            <!-- AQI overview -->
-            <article class="card aqi-card" aria-labelledby="aqi-title">
-              <div class="card__head">
-                <h3 id="aqi-title" class="card__title">Air Quality Index</h3>
+          <!-- Parameter & View Filter Pills -->
+          <div class="filter-bar">
+            <div class="filter-bar__group filter-bar__modes">
+              <button type="button" class="filter-pill is-active" data-view="aqi">
+                <svg class="icon icon--sm"><use href="#i-wind"/></svg>
+                <span>AQI</span>
+              </button>
+              <button type="button" class="filter-pill" data-view="weather" id="toggleWeatherView">
+                <svg class="icon icon--sm"><use href="#i-sun"/></svg>
+                <span>Weather</span>
+              </button>
+            </div>
+            <div class="filter-bar__pills" id="paramPills">
+              <button type="button" class="filter-pill is-active" data-param="aqi">AQI</button>
+              <button type="button" class="filter-pill" data-param="history" data-scroll="#air-quality">
+                <svg class="icon icon--sm"><use href="#i-cal"/></svg> <span>History</span>
+              </button>
+              <button type="button" class="filter-pill" data-param="pm2_5" data-scroll="#air-quality">PM2.5</button>
+              <button type="button" class="filter-pill" data-param="pm10" data-scroll="#air-quality">PM10</button>
+              <button type="button" class="filter-pill" data-param="co" data-scroll="#air-quality">CO</button>
+              <button type="button" class="filter-pill" data-param="so2" data-scroll="#air-quality">SO₂</button>
+              <button type="button" class="filter-pill" data-param="no2" data-scroll="#air-quality">NO₂</button>
+              <button type="button" class="filter-pill" data-param="o3" data-scroll="#air-quality">O₃</button>
+            </div>
+          </div>
+
+          <!-- Mega Commercial AQI Hero Card -->
+          <article class="mega-hero-card" id="megaHeroCard" aria-labelledby="aqiHeroStatus">
+            
+            <!-- Left Side: AQI Telemetry & Scale -->
+            <div class="mega-hero-main">
+              <div class="mega-hero-badge-row">
+                <span class="live-indicator"><span class="pulse-ring"></span> Live AQI</span>
                 <span class="tag tag--sample" data-source-tag>Sample data</span>
               </div>
 
-              <div class="aqi-card__body">
-                <div class="gauge" id="gauge" role="img" aria-label="AQI 164 out of 500, Unhealthy">
-                  <svg viewBox="0 0 200 200" aria-hidden="true">
-                    <defs>
-                      <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stop-color="#f59e0b"/>
-                        <stop offset="100%" stop-color="#f97316"/>
-                      </linearGradient>
-                    </defs>
-                    <circle class="gauge__track" cx="100" cy="100" r="84" />
-                    <circle class="gauge__value" id="gaugeValue" cx="100" cy="100" r="84" />
-                  </svg>
-                  <div class="gauge__center">
-                    <span class="gauge__num" id="aqiNumber" data-target="164">0</span>
-                    <span class="gauge__max">/ 500</span>
-                  </div>
+              <div class="hero-aqi-row">
+                <div class="hero-aqi-val-wrap">
+                  <span class="hero-aqi-number" id="aqiNumber" data-target="164">164</span>
+                  <span class="hero-aqi-unit">AQI (US)</span>
                 </div>
-
-                <div class="aqi-card__info">
-                  <span class="status-pill" id="aqiPill"><span class="dot"></span><span id="aqiLabel">Unhealthy</span></span>
-                  <dl class="kv">
-                    <div><dt>Primary pollutant</dt><dd id="aqiPrimary">PM2.5</dd></div>
-                    <div><dt>Scale</dt><dd>0 – 500</dd></div>
-                  </dl>
-                  <p class="aqi-card__text" id="aqiText">At AQI 164, everyone may begin to experience health effects, and sensitive groups may experience more serious effects. Limit prolonged outdoor exertion.</p>
+                <div class="hero-aqi-status-box">
+                  <span class="hero-status-caption">Air Quality is</span>
+                  <div class="status-pill hero-status-pill" id="aqiPill">
+                    <span class="dot"></span>
+                    <span id="aqiLabel">Unhealthy</span>
+                  </div>
                 </div>
               </div>
 
-              <div class="aqi-scale" aria-label="AQI category scale">
+              <!-- Quick Pollutant Sub-metrics -->
+              <div class="hero-pollutants-row">
+                <span class="hero-pol-item"><strong>PM2.5 :</strong> <span id="heroPm25Val">78.4 µg/m³</span></span>
+                <span class="hero-pol-divider">|</span>
+                <span class="hero-pol-item"><strong>PM10 :</strong> <span id="heroPm10Val">96 µg/m³</span></span>
+                <span class="hero-pol-divider">|</span>
+                <span class="hero-pol-item"><strong>Primary :</strong> <span id="aqiPrimary">PM2.5</span></span>
+              </div>
+
+              <!-- Continuous Color Spectrum Scale Bar -->
+              <div class="aqi-scale aqi-scale--hero" aria-label="AQI category scale">
                 <div class="aqi-scale__bar" id="aqiScale">
                   <span class="aqi-scale__seg" style="--w:10%;--c:var(--aq-good)" title="0–50 Good"></span>
                   <span class="aqi-scale__seg" style="--w:10%;--c:var(--aq-moderate)" title="51–100 Moderate"></span>
-                  <span class="aqi-scale__seg" style="--w:10%;--c:var(--aq-sensitive)" title="101–150 Unhealthy for Sensitive Groups"></span>
+                  <span class="aqi-scale__seg" style="--w:10%;--c:var(--aq-sensitive)" title="101–150 Sensitive"></span>
                   <span class="aqi-scale__seg" style="--w:10%;--c:var(--aq-unhealthy)" title="151–200 Unhealthy"></span>
-                  <span class="aqi-scale__seg" style="--w:20%;--c:var(--aq-very)" title="201–300 Very Unhealthy"></span>
+                  <span class="aqi-scale__seg" style="--w:20%;--c:var(--aq-very)" title="201–300 Severe"></span>
                   <span class="aqi-scale__seg" style="--w:40%;--c:var(--aq-hazard)" title="301–500 Hazardous"></span>
-                  <span class="aqi-scale__marker" id="scaleMarker" style="left:0%"><span>164</span></span>
+                  <span class="aqi-scale__marker" id="scaleMarker" style="left:32.8%"><span>164</span></span>
                 </div>
-                <ul class="legend">
-                  <li><i style="background:var(--aq-good)"></i>Good <small>0–50</small></li>
-                  <li><i style="background:var(--aq-moderate)"></i>Moderate <small>51–100</small></li>
-                  <li><i style="background:var(--aq-sensitive)"></i>Sensitive <small>101–150</small></li>
-                  <li><i style="background:var(--aq-unhealthy)"></i>Unhealthy <small>151–200</small></li>
-                  <li><i style="background:var(--aq-very)"></i>Very unhealthy <small>201–300</small></li>
-                  <li><i style="background:var(--aq-hazard)"></i>Hazardous <small>301+</small></li>
-                </ul>
+                <div class="hero-scale-labels">
+                  <span>Good<small>0</small></span>
+                  <span>Moderate<small>50</small></span>
+                  <span>Poor<small>100</small></span>
+                  <span>Unhealthy<small>150</small></span>
+                  <span>Severe<small>200</small></span>
+                  <span>Hazardous<small>300</small></span>
+                  <span>301+</span>
+                </div>
               </div>
-            </article>
 
-            <!-- Weather -->
-            <article class="card weather-card" aria-labelledby="wx-title">
-              <div class="card__head">
-                <h3 id="wx-title" class="card__title">Weather</h3>
-                <span class="tag tag--sample" data-source-tag>Sample data</span>
-              </div>
-              <div class="weather-card__main">
-                <span class="weather-card__icon"><svg class="icon icon--xl" aria-hidden="true"><use id="wxIconUse" href="#i-cloud"/></svg></span>
-                <div>
-                  <p class="weather-card__temp"><span id="wxTemp">29</span>°<small>C</small></p>
-                  <p class="weather-card__cond" id="wxCond">Hazy · Partly cloudy</p>
+              <p class="aqi-card__text hero-health-text" id="aqiText">At AQI 164, everyone may begin to experience health effects, and sensitive groups may experience more serious effects. Limit prolonged outdoor exertion.</p>
+            </div>
+
+            <!-- Right Side: Weather Capsule + Mini AQI Map -->
+            <div class="mega-hero-side">
+              
+              <!-- Frosted Weather Capsule -->
+              <div class="hero-weather-capsule" id="heroWeatherCapsule">
+                <div class="capsule-top">
+                  <div class="capsule-weather-main">
+                    <span class="capsule-icon"><svg class="icon"><use id="wxIconUse" href="#i-cloud"/></svg></span>
+                    <div class="capsule-temp-block">
+                      <span class="capsule-temp"><span id="wxTemp">29</span>°C</span>
+                      <span class="capsule-cond" id="wxCond">Hazy · Partly cloudy</span>
+                    </div>
+                  </div>
+                  <a class="capsule-link" href="#air-quality" title="View details" aria-label="View weather and pollutant details">
+                    <svg class="icon icon--sm"><use href="#i-share"/></svg>
+                  </a>
+                </div>
+                <div class="capsule-metrics">
+                  <div class="capsule-metric-item">
+                    <svg class="icon icon--sm"><use href="#i-drop"/></svg>
+                    <div>
+                      <span class="metric-lbl">Humidity</span>
+                      <strong class="metric-val" id="wxHum">58 %</strong>
+                    </div>
+                  </div>
+                  <div class="capsule-metric-item">
+                    <svg class="icon icon--sm"><use href="#i-wind"/></svg>
+                    <div>
+                      <span class="metric-lbl">Wind Speed</span>
+                      <strong class="metric-val" id="wxWind">9 km/h</strong>
+                    </div>
+                  </div>
+                  <div class="capsule-metric-item">
+                    <svg class="icon icon--sm"><use href="#i-temp"/></svg>
+                    <div>
+                      <span class="metric-lbl">Feels Like</span>
+                      <strong class="metric-val" id="wxFeels">29 °C</strong>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <ul class="wx-grid">
-                <li><svg class="icon"><use href="#i-temp"/></svg><div><span>Feels like</span><strong id="wxFeels">29 °C</strong></div></li>
-                <li><svg class="icon"><use href="#i-drop"/></svg><div><span>Humidity</span><strong id="wxHum">58 %</strong></div></li>
-                <li><svg class="icon"><use href="#i-wind"/></svg><div><span>Wind speed</span><strong id="wxWind">9 km/h</strong></div></li>
-                <li><svg class="icon"><use href="#i-eye"/></svg><div><span>Visibility</span><strong id="wxVis">3.2 km</strong></div></li>
-                <li class="wx-grid__wide"><svg class="icon"><use href="#i-rain"/></svg><div><span>Chance of rain</span><strong id="wxRain">15 %</strong></div></li>
-              </ul>
-            </article>
-          </div>
+
+              <!-- Mini AQI Map Preview Card -->
+              <div class="hero-map-card" id="heroMapCard">
+                <div class="hero-map-canvas" aria-hidden="true">
+                  <div class="map-grid-layer"></div>
+                  <!-- Sensor points -->
+                  <div class="map-sensor s-center" id="mapSensorCenter" style="--val:'164';top:45%;left:50%"></div>
+                  <div class="map-sensor s-north" style="--val:'148';top:22%;left:38%"></div>
+                  <div class="map-sensor s-east" style="--val:'172';top:35%;left:75%"></div>
+                  <div class="map-sensor s-south" style="--val:'159';top:68%;left:62%"></div>
+                  <div class="map-sensor s-west" style="--val:'135';top:60%;left:25%"></div>
+                  <div class="map-radar"></div>
+                </div>
+                <div class="hero-map-header">
+                  <span class="hero-map-tag"><svg class="icon icon--sm"><use href="#i-target"/></svg> AQI Map</span>
+                  <span class="map-expand-btn"><svg class="icon icon--sm"><use href="#i-chev"/></svg></span>
+                </div>
+                <div class="hero-map-footer">
+                  <svg class="icon icon--sm"><use href="#i-pin"/></svg>
+                  <span id="mapCityPin">New Delhi</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Hidden compatibility element anchors (keeps script.js 100% compliant) -->
+            <div class="sr-only" aria-hidden="true">
+              <span id="locCity">New Delhi</span>
+              <span id="locCountry">India</span>
+              <span id="locRegion">National Capital Territory</span>
+              <span id="locTime">—</span>
+              <span id="wxVis">3.2 km</span>
+              <span id="wxRain">15 %</span>
+              <div id="gauge">
+                <svg><circle id="gaugeValue" cx="100" cy="100" r="84"></circle></svg>
+              </div>
+            </div>
+          </article>
+
         </section>
 
         <!-- ============ AIR QUALITY ============ -->
