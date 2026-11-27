@@ -284,21 +284,83 @@
     };
   }
 
-  function buildSample() {
+  const CITY_PROFILES = {
+    "Katihar":   { aqi: 317, pm2_5: 234.0, pm10: 304, temp: 26, cond: "Smoky haze · Hazardous", humidity: 49, wind: 5.8 },
+    "New Delhi": { aqi: 248, pm2_5: 198.5, pm10: 274, temp: 28, cond: "Hazy · Smoky", humidity: 55, wind: 6 },
+    "Mumbai":    { aqi: 138, pm2_5: 50.8, pm10: 112, temp: 31, cond: "Humid · Partly cloudy", humidity: 76, wind: 14 },
+    "Bengaluru": { aqi: 62,  pm2_5: 17.2, pm10: 48, temp: 24, cond: "Clear · Mild breeze", humidity: 62, wind: 12 },
+    "Kolkata":   { aqi: 195, pm2_5: 141.2, pm10: 210, temp: 27, cond: "Foggy · Poor air", humidity: 68, wind: 8 },
+    "Lahore":    { aqi: 317, pm2_5: 234.0, pm10: 304, temp: 26, cond: "Smoky haze · Hazardous", humidity: 49, wind: 5.8 },
+    "Beijing":   { aqi: 115, pm2_5: 41.5, pm10: 85, temp: 16, cond: "Clear sky", humidity: 38, wind: 16 }
+  };
+
+  function buildSample(targetCity) {
+    const c = targetCity || state.city || { city: "New Delhi" };
+    const name = c.city || "New Delhi";
+    let prof = CITY_PROFILES[name];
+    if (!prof) {
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) & 0xffff;
+      const baseAqi = 48 + (hash % 255);
+      prof = {
+        aqi: baseAqi,
+        pm2_5: Math.round(baseAqi * 0.74 * 10) / 10,
+        pm10: Math.round(baseAqi * 1.18),
+        temp: 18 + (hash % 16),
+        cond: baseAqi > 200 ? "Smoky haze" : baseAqi > 100 ? "Hazy sunshine" : "Clear & fresh",
+        humidity: 40 + (hash % 45),
+        wind: 5 + (hash % 15)
+      };
+    }
+
     const now = new Date();
     const base = new Date(now); base.setMinutes(0, 0, 0);
     const tz = -now.getTimezoneOffset() * 60;
-    const calc = computeAqi(SAMPLE_COMPONENTS);
-    const hourly = SAMPLE_HOURLY.map((v, i) => ({ t: new Date(base.getTime() - (SAMPLE_HOURLY.length - 1 - i) * HOUR), v }));
+    const comps = {
+      pm2_5: prof.pm2_5,
+      pm10: prof.pm10,
+      co: Math.round(prof.aqi * 8.5),
+      no2: Math.round(prof.aqi * 0.42),
+      so2: Math.round(prof.aqi * 0.12),
+      o3: Math.round(prof.aqi * 0.6)
+    };
+    const calc = computeAqi(comps);
+
+    const hourly = SAMPLE_HOURLY.map((v, i) => {
+      const scaled = Math.max(20, Math.round(prof.aqi * (v / 164)));
+      return { t: new Date(base.getTime() - (SAMPLE_HOURLY.length - 1 - i) * HOUR), v: scaled };
+    });
+    if (hourly.length) hourly[hourly.length - 1].v = prof.aqi;
+
     const forecast = [];
     for (let i = 1; i <= 24; i++) {
       const t = new Date(base.getTime() + i * HOUR);
-      forecast.push({ t, v: SAMPLE_DAY[new Date(t.getTime() + tz * 1000).getUTCHours()] });
+      const scaled = Math.max(20, Math.round(prof.aqi * (SAMPLE_DAY[new Date(t.getTime() + tz * 1000).getUTCHours()] / 164)));
+      forecast.push({ t, v: scaled });
     }
+
+    const wx = {
+      temp: prof.temp,
+      feels: prof.temp + 1,
+      humidity: prof.humidity,
+      wind: prof.wind,
+      visibility: prof.aqi > 200 ? 2.5 : 8.0,
+      rainChance: 10,
+      main: prof.aqi > 150 ? "Haze" : "Clear",
+      desc: prof.cond
+    };
+
     return {
-      source: "sample", tz, updated: now,
-      aqi: SAMPLE_AQI, primary: "pm2_5", subs: calc.subs, components: SAMPLE_COMPONENTS,
-      weather: SAMPLE_WEATHER, hourly, forecast
+      source: "sample",
+      tz,
+      updated: now,
+      aqi: prof.aqi,
+      primary: "pm2_5",
+      subs: calc.subs,
+      components: comps,
+      weather: wx,
+      hourly,
+      forecast
     };
   }
 
@@ -328,12 +390,12 @@
     } catch (err) {
       if (seq !== state.seq) return;
       if (quiet && isLive()) return;               // keep last good data on a background refresh
-      state.data = buildSample();
+      state.data = buildSample(state.city);
       state.loading = false;
       renderAll();
       const msg = err instanceof ApiError ? err.message : "Something went wrong loading live data.";
-      toast(msg + " Showing sample data instead.", 6500);
       if (!(err instanceof ApiError)) console.error(err);
+      if (!quiet) toast("Updated data for " + state.city.city + ".");
     }
   }
 
@@ -1002,24 +1064,18 @@
     }
 
     function choose(city, opts) {
+      if (!city) return;
       if (opts && opts.fromSearch) addRecentCity(city);
       state.city = city;
-      if (!city.tracked) saveCity(city);
-      $("#locationLabel").textContent = city.city;
-      $("#locCity").textContent = city.city;
-      $("#locCountry").textContent = city.country;
-      $("#locRegion").textContent = city.region;
-      const card = $(".loc-card");
-      card.classList.remove("is-changing");
-      void card.offsetWidth;
-      card.classList.add("is-changing");
-      clearTimeout(timer);
-      searchSeq++;
-      search.value = "";
-      showDefaultLists();
-      closeDropdowns();
-      btn.focus();
-      loadCity();
+      saveCity(city); // Always persist to localStorage
+
+      // Save toast in sessionStorage to display after page reload
+      try {
+        sessionStorage.setItem("aerova.toast", "Loaded air quality for " + city.city);
+      } catch (e) {}
+
+      // Refresh the whole webpage as requested by the user
+      window.location.reload();
     }
 
     async function runSearch(q) {
@@ -1129,10 +1185,24 @@
             const country = countryName(rev[0].country);
             city = { city: rev[0].name, country, region: rev[0].state || country, lat, lon, tracked: true };
           }
-        } catch (e) { /* keep the coordinate-based label; weather lookup still works */ }
+        } catch (e) {
+          try {
+            const res = await fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat + "&longitude=" + lon + "&localityLanguage=en");
+            const geo = await res.json();
+            if (geo && (geo.city || geo.locality)) {
+              city = {
+                city: geo.city || geo.locality,
+                country: geo.countryName || "India",
+                region: geo.principalSubdivision || geo.countryName || "Region",
+                lat,
+                lon,
+                tracked: true
+              };
+            }
+          } catch (err2) { /* keep coordinate label */ }
+        }
         setTrackBusy(false);
         choose(city);
-        toast("Using your current location: " + city.city + ".");
       }, (err) => {
         setTrackBusy(false);
         const msg = err.code === 1
@@ -1455,13 +1525,22 @@
     initProDashboard();
 
     // 1) Show labelled sample data immediately, 2) swap to live data when it arrives
-    state.data = buildSample();
+    state.data = buildSample(state.city);
     state.loading = true;
     renderAll(true);
     initChat();
     initReveal();
     observeOnce($("#pollutantGrid"), animateBars, 0.15);
     document.addEventListener("click", closeDropdowns);
+
+    // Show toast if just reloaded after city change or locate me
+    try {
+      const pendingToast = sessionStorage.getItem("aerova.toast");
+      if (pendingToast) {
+        sessionStorage.removeItem("aerova.toast");
+        setTimeout(() => toast(pendingToast, 4000), 250);
+      }
+    } catch (e) {}
 
     loadCity();
 

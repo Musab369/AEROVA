@@ -504,6 +504,13 @@ main { padding: 0 var(--pad) 40px; outline: none; width: 100%; max-width: 1280px
   box-shadow: 0 20px 48px -14px rgba(19, 58, 66, 0.16);
   transition: background 0.5s var(--ease), border-color 0.5s;
 }
+.mega-hero-card.is-changing {
+  animation: heroPulse 0.45s var(--ease);
+}
+@keyframes heroPulse {
+  0% { opacity: 0.75; transform: scale(0.995); }
+  100% { opacity: 1; transform: scale(1); }
+}
 .mega-hero-card::before {
   content: "";
   position: absolute;
