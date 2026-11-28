@@ -1421,19 +1421,20 @@
       renderList(base, "Suggested cities");
     }
 
-    function choose(city, opts) {
+    async function choose(city, opts) {
       if (!city) return;
       if (opts && opts.fromSearch) addRecentCity(city);
       state.city = city;
       saveCity(city); // Always persist to localStorage
 
-      // Save toast in sessionStorage to display after page reload
-      try {
-        sessionStorage.setItem("aerova.toast", "Loaded air quality for " + city.city);
-      } catch (e) {}
+      $("#locationLabel").textContent = city.city;
+      closeDropdowns();
 
-      // Refresh the whole webpage as requested by the user
-      window.location.reload();
+      try {
+        await loadCity();
+      } finally {
+        setTrackBusy(false);
+      }
     }
 
     async function runSearch(q) {
@@ -1530,6 +1531,14 @@
     function setTrackBusy(busy) {
       track.classList.toggle("is-busy", busy);
       $("#trackLabel").textContent = busy ? "Finding your location…" : "Use my current location";
+
+      const headerLocate = $("#headerLocateBtn");
+      if (headerLocate) {
+        headerLocate.classList.toggle("is-busy", busy);
+        headerLocate.setAttribute("aria-busy", String(busy));
+        const txt = $("#headerLocateText") || headerLocate.querySelector("span");
+        if (txt) txt.textContent = busy ? "Locating…" : "Locate me";
+      }
     }
     track.addEventListener("click", () => {
       if (!navigator.geolocation) { toast("Your browser does not support location. Search for your city instead."); return; }
@@ -1559,8 +1568,7 @@
             }
           } catch (err2) { /* keep coordinate label */ }
         }
-        setTrackBusy(false);
-        choose(city);
+        await choose(city);
       }, (err) => {
         setTrackBusy(false);
         const msg = err.code === 1

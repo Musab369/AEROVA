@@ -425,6 +425,15 @@ main { padding: 0 var(--pad) 40px; outline: none; width: 100%; max-width: 1280px
   color: #0284c7;
   transform: translateY(-1px);
 }
+.btn-pill-action.is-busy {
+  opacity: 0.85;
+  pointer-events: none;
+  border-color: #0284c7;
+  color: #0284c7;
+}
+.btn-pill-action.is-busy .icon {
+  animation: spin 0.9s linear infinite;
+}
 .icon-circle-btn {
   width: 40px;
   height: 40px;
@@ -1949,6 +1958,10 @@ main { padding: 0 var(--pad) 40px; outline: none; width: 100%; max-width: 1280px
   background: rgba(255, 255, 255, 0.12);
   border-color: #38bdf8;
   color: #fff;
+}
+[data-theme="dark"] .btn-pill-action.is-busy {
+  border-color: #38bdf8;
+  color: #38bdf8;
 }
 [data-theme="dark"] .filter-pill {
   background: rgba(255, 255, 255, 0.05);
