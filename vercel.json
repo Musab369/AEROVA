@@ -1,0 +1,19 @@
+{
+  "functions": {
+    "api/weather.js": {
+      "memory": 128,
+      "maxDuration": 15
+    },
+    "api/airquality.js": {
+      "memory": 128,
+      "maxDuration": 15
+    }
+  },
+  "env": {
+    "WAQI_API_KEY": "@waqi-api-key"
+  },
+  "rewrites": [
+    { "source": "/api/weather", "destination": "/api/weather.js" },
+    { "source": "/api/airquality", "destination": "/api/airquality.js" }
+  ]
+}
