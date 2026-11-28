@@ -264,12 +264,6 @@
       clearTimeout(timer);
     }
 
-    console.log("WAQI response status:", res.status);
-console.log("WAQI response URL:", res.url);
-
-const responseText = await res.clone().text();
-console.log("WAQI response body:", responseText);
-
     const text = await res.text();
     let data = null;
     try {
