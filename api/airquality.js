@@ -15,9 +15,9 @@ const REQUEST_TIMEOUT_MS = 10000;
 
 // US EPA AQI breakpoints [conc_low, conc_high, aqi_low, aqi_high]
 const EPA_BREAKPOINTS = {
-  pm2_5: [[0, 9, 0, 50], [9.1, 35.4, 51, 100], [35.5, 55.4, 101, 150], [55.5, 125.4, 151, 200], [125.5, 225.4, 201, 300], [225.5, 325.4, 301, 500]],
-  pm10:  [[0, 54, 0, 50], [55, 154, 51, 100], [155, 254, 101, 150], [255, 354, 151, 200], [355, 424, 201, 300], [425, 604, 301, 500]],
-  o3:    [[0, 54, 0, 50], [55, 70, 51, 100], [71, 85, 101, 150], [86, 105, 151, 200], [106, 200, 201, 300]],
+  pm2_5: [[0, 9, 0, 50], [9.1, 35.4, 51, 100], [35.5, 55.4, 101, 150], [55.5, 125.4, 151, 200], [125.5, 225.4, 201, 300], [225.5, 325.4, 301, 400], [325.5, 500, 401, 500]],
+  pm10:  [[0, 54, 0, 50], [55, 154, 51, 100], [155, 254, 101, 150], [255, 354, 151, 200], [355, 424, 201, 300], [425, 504, 301, 400], [505, 604, 401, 500]],
+  o3:    [[0, 54, 0, 50], [55, 70, 51, 100], [71, 85, 101, 150], [86, 105, 151, 200], [106, 200, 201, 300], [201, 400, 301, 500]],
   no2:   [[0, 53, 0, 50], [54, 100, 51, 100], [101, 360, 101, 150], [361, 649, 151, 200], [650, 1249, 201, 300], [1250, 2049, 301, 500]],
   so2:   [[0, 35, 0, 50], [36, 75, 51, 100], [76, 185, 101, 150], [186, 304, 151, 200], [305, 604, 201, 300], [605, 1004, 301, 500]],
   co:    [[0, 4.4, 0, 50], [4.5, 9.4, 51, 100], [9.5, 12.4, 101, 150], [12.5, 15.4, 151, 200], [15.5, 30.4, 201, 300], [30.5, 50.4, 301, 500]]
@@ -35,11 +35,14 @@ const CONVERSIONS = {
 function calcSubIndex(key, ugm3) {
   const bpList = EPA_BREAKPOINTS[key];
   if (!bpList) return 0;
-  const c = (ugm3 || 0) * (CONVERSIONS[key] || 1);
+  const c = Math.max(0, (ugm3 || 0) * (CONVERSIONS[key] || 1));
   for (const [cl, ch, il, ih] of bpList) {
     if (c <= ch) return Math.max(il, Math.round(((ih - il) / (ch - cl)) * (c - cl) + il));
   }
-  return 500;
+  const last = bpList[bpList.length - 1];
+  const [cl, ch, il, ih] = last;
+  const extrapolated = Math.round(((ih - il) / (ch - cl)) * (c - cl) + il);
+  return Math.min(500, Math.max(ih, extrapolated));
 }
 
 function calcAqi(components) {
@@ -256,6 +259,16 @@ module.exports = async function handler(req, res) {
     if (token && token.startsWith("aqi_") && city) {
       try {
         result = await fetchXkdr(token, city);
+        // If XKDR data is older than 48 hours or reports an extreme 500 reading, check OpenWeather for live current data
+        if (result && owmKey && Number.isFinite(lat) && Number.isFinite(lon)) {
+          const dataAge = Date.now() - (new Date(result.time).getTime() || 0);
+          if (dataAge > 48 * 3600 * 1000 || result.aqi >= 450) {
+            const owmFallback = await fetchOwmPollution(owmKey, lat, lon, city);
+            if (owmFallback && owmFallback.aqi != null) {
+              result = owmFallback;
+            }
+          }
+        }
       } catch (_) {
         result = null;
       }

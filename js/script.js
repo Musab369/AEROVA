@@ -38,12 +38,12 @@
   ];
 
   /* US EPA AQI breakpoints [conc low, conc high, AQI low, AQI high].
-     OpenWeather returns µg/m³; `conv` converts to the unit EPA uses
+     OpenWeather and standard stations return µg/m³; `conv` converts to the unit EPA uses
      (µg/m³ for PM, ppb for O3/NO2/SO2, ppm for CO, at 25 °C). */
   const BREAKPOINTS = {
-    pm2_5: { conv: 1,        bp: [[0, 9, 0, 50], [9.1, 35.4, 51, 100], [35.5, 55.4, 101, 150], [55.5, 125.4, 151, 200], [125.5, 225.4, 201, 300], [225.5, 325.4, 301, 500]] },
-    pm10:  { conv: 1,        bp: [[0, 54, 0, 50], [55, 154, 51, 100], [155, 254, 101, 150], [255, 354, 151, 200], [355, 424, 201, 300], [425, 604, 301, 500]] },
-    o3:    { conv: 0.509,    bp: [[0, 54, 0, 50], [55, 70, 51, 100], [71, 85, 101, 150], [86, 105, 151, 200], [106, 200, 201, 300]] },
+    pm2_5: { conv: 1,        bp: [[0, 9, 0, 50], [9.1, 35.4, 51, 100], [35.5, 55.4, 101, 150], [55.5, 125.4, 151, 200], [125.5, 225.4, 201, 300], [225.5, 325.4, 301, 400], [325.5, 500, 401, 500]] },
+    pm10:  { conv: 1,        bp: [[0, 54, 0, 50], [55, 154, 51, 100], [155, 254, 101, 150], [255, 354, 151, 200], [355, 424, 201, 300], [425, 504, 301, 400], [505, 604, 401, 500]] },
+    o3:    { conv: 0.509,    bp: [[0, 54, 0, 50], [55, 70, 51, 100], [71, 85, 101, 150], [86, 105, 151, 200], [106, 200, 201, 300], [201, 400, 301, 500]] },
     no2:   { conv: 0.532,    bp: [[0, 53, 0, 50], [54, 100, 51, 100], [101, 360, 101, 150], [361, 649, 151, 200], [650, 1249, 201, 300], [1250, 2049, 301, 500]] },
     so2:   { conv: 0.382,    bp: [[0, 35, 0, 50], [36, 75, 51, 100], [76, 185, 101, 150], [186, 304, 151, 200], [305, 604, 201, 300], [605, 1004, 301, 500]] },
     co:    { conv: 0.000873, bp: [[0, 4.4, 0, 50], [4.5, 9.4, 51, 100], [9.5, 12.4, 101, 150], [12.5, 15.4, 151, 200], [15.5, 30.4, 201, 300], [30.5, 50.4, 301, 500]] }
@@ -163,11 +163,16 @@
      --------------------------------------------------------- */
   function subIndex(key, microgramsPerM3) {
     const def = BREAKPOINTS[key];
-    const c = (microgramsPerM3 || 0) * def.conv;
+    if (!def) return 0;
+    const c = Math.max(0, (microgramsPerM3 || 0) * def.conv);
     for (const [cl, ch, il, ih] of def.bp) {
       if (c <= ch) return Math.max(il, Math.round(((ih - il) / (ch - cl)) * (c - cl) + il));
     }
-    return 500;
+    // Smooth linear extrapolation if concentration exceeds highest bracket (capped at 500)
+    const last = def.bp[def.bp.length - 1];
+    const [cl, ch, il, ih] = last;
+    const extrapolated = Math.round(((ih - il) / (ch - cl)) * (c - cl) + il);
+    return Math.min(500, Math.max(ih, extrapolated));
   }
 
   function computeAqi(components) {
@@ -337,36 +342,41 @@
       };
     }
 
+    // All components are maintained in standard µg/m³
     const wc = waqiData.components || {};
     const components = {
-      pm2_5: wc.pm2_5 != null ? wc.pm2_5 : 0,
-      pm10:  wc.pm10  != null ? wc.pm10  : 0,
-      co:    wc.co    != null ? wc.co * 1145 : 0,   // ppm → µg/m³ for display (mg/m³ for sub-index via scale)
-      no2:   wc.no2   != null ? wc.no2 * 1.88  : 0,  // ppb → µg/m³
-      so2:   wc.so2   != null ? wc.so2 * 2.62  : 0,  // ppb → µg/m³
-      o3:    wc.o3    != null ? wc.o3  * 1.96  : 0   // ppb → µg/m³
+      pm2_5: wc.pm2_5 != null ? Number(wc.pm2_5) : 0,
+      pm10:  wc.pm10  != null ? Number(wc.pm10)  : 0,
+      co:    wc.co    != null ? Number(wc.co)    : 0,
+      no2:   wc.no2   != null ? Number(wc.no2)   : 0,
+      so2:   wc.so2   != null ? Number(wc.so2)   : 0,
+      o3:    wc.o3    != null ? Number(wc.o3)    : 0
     };
 
     const calc = computeAqi(components);
+    // Use calculated EPA AQI if station value is missing or unrealistic (e.g. pegged at 500)
+    const effectiveAqi = (typeof waqiData.aqi === "number" && waqiData.aqi > 0 && waqiData.aqi < 500)
+      ? waqiData.aqi
+      : calc.aqi;
     const now = new Date();
 
-    // No hourly history from WAQI free tier — build a smooth sample curve around the real AQI
+    // Build hourly sample curve around the real effective AQI
     const hourly = [];
     const base = new Date(now); base.setMinutes(0, 0, 0);
     for (let i = 23; i >= 1; i--) {
       const jitter = (Math.sin(i * 1.3) * 0.12 + Math.cos(i * 0.7) * 0.08);
-      const v = Math.max(5, Math.round(waqiData.aqi * (1 + jitter)));
+      const v = Math.max(5, Math.round(effectiveAqi * (1 + jitter)));
       hourly.push({ t: new Date(base.getTime() - i * HOUR), v });
     }
-    hourly.push({ t: now, v: waqiData.aqi });
+    hourly.push({ t: now, v: effectiveAqi });
 
-    // Build 24-hour forecast using a diurnal pattern scaled to the real AQI
+    // Build 24-hour forecast using a diurnal pattern scaled to the real effective AQI
     const forecast = [];
     for (let i = 1; i <= 24; i++) {
       const t = new Date(base.getTime() + i * HOUR);
       const hOfDay = new Date(t.getTime()).getHours();
       const diurnal = 1 + 0.18 * Math.sin((hOfDay - 6) * Math.PI / 12);
-      const v = Math.max(5, Math.round(waqiData.aqi * diurnal));
+      const v = Math.max(5, Math.round(effectiveAqi * diurnal));
       forecast.push({ t, v });
     }
 
@@ -412,7 +422,7 @@
       source: "live",
       tz: tzOffset,
       updated: waqiData.time ? new Date(waqiData.time) : new Date((wx.dt || nowSec) * 1000),
-      aqi: waqiData.aqi,
+      aqi: effectiveAqi,
       primary: calc.primary,
       subs: calc.subs,
       components,
@@ -512,6 +522,7 @@
   }
 
   const CITY_PROFILES = {
+    "Patna":     { aqi: 182, pm2_5: 114.5, pm10: 168, temp: 27, cond: "Hazy sunshine", humidity: 58, wind: 6.5 },
     "Katihar":   { aqi: 317, pm2_5: 234.0, pm10: 304, temp: 26, cond: "Smoky haze · Hazardous", humidity: 49, wind: 5.8 },
     "New Delhi": { aqi: 248, pm2_5: 198.5, pm10: 274, temp: 28, cond: "Hazy · Smoky", humidity: 55, wind: 6 },
     "Mumbai":    { aqi: 138, pm2_5: 50.8, pm10: 112, temp: 31, cond: "Humid · Partly cloudy", humidity: 76, wind: 14 },
