@@ -1729,6 +1729,7 @@
     const log = $("#chatLog");
     const form = $("#chatForm");
     const input = $("#chatInput");
+    if (!log || !form || !input) return; // Chat is hosted on assistant.html
     let busy = false;
 
     function addMessage(kind, content, isHtml) {

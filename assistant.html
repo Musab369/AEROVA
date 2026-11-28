@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>AEROVA – AI Agent &amp; Assistant</title>
+  <meta name="description" content="Ask the AEROVA environmental intelligence agent about air quality, weather, health guidance, and outdoor precautions." />
+  <meta name="theme-color" content="#d9ecea" id="themeMeta" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* Specific styles for standalone Assistant Page */
+    .assistant-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-0);
+      color: var(--text);
+    }
+    .assistant-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.75rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+    }
+    .assistant-header__left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .assistant-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.9rem;
+      border-radius: var(--r-md);
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .assistant-back-btn:hover {
+      background: rgba(6, 182, 212, 0.1);
+      border-color: var(--cyan);
+      color: var(--cyan);
+      transform: translateX(-2px);
+    }
+    .assistant-header__title-group {
+      display: flex;
+      flex-direction: column;
+    }
+    .assistant-header__title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .assistant-header__sub {
+      font-size: 0.78rem;
+      color: var(--text-mute);
+      margin: 0;
+    }
+    .assistant-main {
+      flex: 1;
+      max-width: 960px;
+      width: 100%;
+      margin: 2rem auto;
+      padding: 0 1.25rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .assistant-card-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .assistant-card-wrap .chat.card {
+      flex: 1;
+      min-height: 580px;
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow);
+    }
+    .assistant-card-wrap .chat__log {
+      height: 480px;
+      max-height: calc(100vh - 340px);
+    }
+    .assistant-agent-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    @media (max-width: 768px) {
+      .assistant-header {
+        padding: 0.85rem 1rem;
+      }
+      .assistant-main {
+        margin: 1rem auto;
+        padding: 0 0.85rem 1.5rem;
+      }
+      .assistant-card-wrap .chat__log {
+        height: 380px;
+      }
+    }
+  </style>
+</head>
+<body class="assistant-page">
+
+  <!-- SVG Sprite -->
+  <svg style="display:none;" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <symbol id="i-logo" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" fill="currentColor"/></symbol>
+      <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-send" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/></symbol>
+      <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 2.1 5.4L20 10.5l-5.4 2.1L12 18l-2.1-5.4L4.5 10.5l5.4-2.1L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M19 16.5l1 2.5 2.5 1-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1 1-2.5z" fill="currentColor"/></symbol>
+      <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.25" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    </defs>
+  </svg>
+
+  <header class="assistant-header">
+    <div class="assistant-header__left">
+      <a href="index.html" class="assistant-back-btn" aria-label="Back to AEROVA Dashboard">
+        <svg class="icon" style="width:1.1rem;height:1.1rem;"><use href="#i-arrow-left"/></svg>
+        <span>Back to Dashboard</span>
+      </a>
+      <div class="assistant-header__title-group">
+        <h1 class="assistant-header__title">
+          <span>AEROVA Agent</span>
+          <span class="assistant-agent-badge"><span class="status-dot"></span> Live Assistant</span>
+        </h1>
+        <p class="assistant-header__sub" id="assistantCitySub">Query environmental intelligence, AQI guidance, and weather precautions</p>
+      </div>
+    </div>
+    <div class="assistant-header__right">
+      <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle theme">
+        <svg class="icon"><use id="themeIconUse" href="#i-moon"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="assistant-main">
+    <div class="assistant-card-wrap">
+      <div class="chat card">
+        <div class="chat__bar">
+          <span class="bot-avatar" aria-hidden="true"><svg class="icon"><use href="#i-logo"/></svg></span>
+          <div>
+            <strong>AEROVA Environmental Intelligence Agent</strong>
+            <small><span class="status-dot"></span>Active · Connected to local atmospheric metrics</small>
+          </div>
+        </div>
+
+        <div class="chat__log" id="chatLog" role="log" aria-live="polite" aria-label="Conversation with AEROVA Agent"></div>
+
+        <div class="chat__suggest" id="chatSuggest" aria-label="Suggested questions">
+          <button type="button" class="suggest" data-q="Is it safe to go outside today?">Is it safe to go outside today?</button>
+          <button type="button" class="suggest" data-q="How can I improve indoor air quality?">How can I improve indoor air quality?</button>
+          <button type="button" class="suggest" id="suggestAqi" data-q="What does the current AQI mean?">What does current AQI mean?</button>
+          <button type="button" class="suggest" data-q="What mask should I wear?">What mask should I wear?</button>
+          <button type="button" class="suggest" data-q="Can I exercise outside today?">Can I exercise outside today?</button>
+        </div>
+
+        <form class="chat__form" id="chatForm" autocomplete="off">
+          <label class="sr-only" for="chatInput">Ask the agent anything about today's air quality, weather, or health precautions</label>
+          <input class="chat__input" id="chatInput" type="text" placeholder="Ask the agent about today's air, weather, or health advice…" maxlength="300" enterkeyhint="send" />
+          <button class="btn btn--primary btn--send" type="submit" aria-label="Send query">
+            <svg class="icon"><use href="#i-send"/></svg><span>Send</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/assistant.js"></script>
+</body>
+</html>

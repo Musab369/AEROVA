@@ -93,8 +93,8 @@
         <a class="nav__link" href="#planner" data-nav-link data-title="Daily Planner">
           <svg class="icon"><use href="#i-cal"/></svg><span>Daily Planner</span>
         </a>
-        <a class="nav__link" href="#assistant" data-nav-link data-title="AI Assistant">
-          <svg class="icon"><use href="#i-chat"/></svg><span>AI Assistant</span>
+        <a class="nav__link" href="assistant.html" data-title="Ask the Agent">
+          <svg class="icon"><use href="#i-spark"/></svg><span>Ask the Agent</span>
         </a>
         <a class="nav__link" href="#about" data-nav-link data-title="About Us">
           <svg class="icon"><use href="#i-info"/></svg><span>About Us</span>
@@ -649,43 +649,6 @@
           <ol class="timeline" id="timeline"><!-- rendered by script.js --></ol>
         </section>
 
-        <!-- ============ ASSISTANT ============ -->
-        <section class="section" id="assistant" data-section data-title="AI Assistant" aria-labelledby="chat-title">
-          <header class="section__head">
-            <div>
-              <h2 class="section__title" id="chat-title">AI assistant</h2>
-              <p class="section__sub">Ask about air quality, health and your day.</p>
-            </div>
-            <span class="tag tag--demo">Rule-based replies</span>
-          </header>
-
-          <div class="chat card">
-            <div class="chat__bar">
-              <span class="bot-avatar" aria-hidden="true"><svg class="icon"><use href="#i-logo"/></svg></span>
-              <div>
-                <strong>AEROVA Assistant</strong>
-                <small><span class="status-dot"></span>Rule-based · no AI model connected</small>
-              </div>
-            </div>
-
-            <div class="chat__log" id="chatLog" role="log" aria-live="polite" aria-label="Conversation"></div>
-
-            <div class="chat__suggest" id="chatSuggest" aria-label="Suggested questions">
-              <button type="button" class="suggest" data-q="Is it safe to go outside today?">Is it safe to go outside today?</button>
-              <button type="button" class="suggest" data-q="How can I improve indoor air quality?">How can I improve indoor air quality?</button>
-              <button type="button" class="suggest" id="suggestAqi" data-q="What does AQI 164 mean?">What does AQI 164 mean?</button>
-            </div>
-
-            <form class="chat__form" id="chatForm" autocomplete="off">
-              <label class="sr-only" for="chatInput">Type your question</label>
-              <input class="chat__input" id="chatInput" type="text" placeholder="Ask about today's air…" maxlength="300" enterkeyhint="send" />
-              <button class="btn btn--primary btn--send" type="submit" aria-label="Send message">
-                <svg class="icon"><use href="#i-send"/></svg><span>Send</span>
-              </button>
-            </form>
-          </div>
-        </section>
-
         <!-- ============ ABOUT US ============ -->
         <section class="section section--about" id="about" data-section data-title="About Us" aria-labelledby="about-title">
           <header class="section__head">
@@ -833,6 +796,16 @@
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <!-- ============ FLOATING AGENT BUTTON ============ -->
+  <aside class="floating-agent" aria-label="Ask the Agent">
+    <a href="assistant.html" class="floating-agent-btn" id="floatingAgentBtn" aria-label="Ask the agent">
+      <span class="floating-agent-icon" aria-hidden="true">
+        <svg class="icon"><use href="#i-spark"/></svg>
+      </span>
+      <span class="floating-agent-label">Ask the agent</span>
+    </a>
+  </aside>
 
   <script src="js/config.js"></script>
   <script src="js/script.js"></script>
