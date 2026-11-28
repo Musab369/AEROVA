@@ -807,7 +807,7 @@
       $("#heroO3Val").textContent = Math.round(state.data.components.o3) + " µg/m³";
     }
     if ($("#stationName")) {
-      $(\"#stationName\").textContent = (isLive() && state.data.waqiStation) ? state.data.waqiStation : (\"CAAQMS Station \u00b7 \" + state.city.city);
+      $("#stationName").textContent = (isLive() && state.data.waqiStation) ? state.data.waqiStation : ("CAAQMS Station \u00b7" + state.city.city);
     }
 
     // Render 24h Hourly Weather Strip
