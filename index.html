@@ -23,7 +23,7 @@
       <symbol id="i-logo" viewBox="0 0 32 32"><path d="M6 21c4.2 0 5.3-3.4 8.7-3.4S19.8 21 24 21M6 14.6c4.2 0 5.3-3.4 8.7-3.4s4.5 3.4 9.3 3.4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><circle cx="25" cy="8" r="2.4" fill="currentColor"/></symbol>
       <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
       <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 8h10a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7a2.5 2.5 0 1 1-2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-      <symbol id="i-spark" viewBox="0 0 24 24">< d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+      <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
       <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 3v4M16 3v4M3.5 10h17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-chat" viewBox="0 0 24 24"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-7l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
       <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 1 1 12 0v6l1.5 2h-15L6 17zM10 21h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
@@ -76,6 +76,9 @@
         <p class="nav__label">Dashboard</p>
         <a class="nav__link is-active" href="#overview" data-nav-link data-title="Overview">
           <svg class="icon"><use href="#i-grid"/></svg><span>Overview</span>
+        </a>
+        <a class="nav__link" href="#weather" data-nav-link data-title="Weather">
+          <svg class="icon"><use href="#i-sun"/></svg><span>Weather</span>
         </a>
         <a class="nav__link" href="#air-quality" data-nav-link data-title="Air Quality">
           <svg class="icon"><use href="#i-wind"/></svg><span>Air Quality</span>
@@ -257,30 +260,55 @@
             <div class="mega-hero-main">
               <div class="mega-hero-badge-row">
                 <span class="live-indicator"><span class="pulse-ring"></span> Live AQI</span>
+                <span class="station-meta-tag" id="stationBadge"><svg class="icon icon--sm"><use href="#i-target"/></svg> <span id="stationName">CPCB / EPA Monitoring Station</span></span>
                 <span class="tag tag--sample" data-source-tag>Sample data</span>
               </div>
 
               <div class="hero-aqi-row">
-                <div class="hero-aqi-val-wrap">
-                  <span class="hero-aqi-number" id="aqiNumber" data-target="164">164</span>
-                  <span class="hero-aqi-unit">AQI (US)</span>
+                <!-- Circular AQI Gauge Indicator -->
+                <div class="hero-gauge-container">
+                  <div class="gauge hero-gauge" id="gauge" role="img" aria-label="AQI gauge">
+                    <svg viewBox="0 0 200 200" aria-hidden="true">
+                      <circle class="gauge__track" cx="100" cy="100" r="84"></circle>
+                      <circle class="gauge__value" id="gaugeValue" cx="100" cy="100" r="84"></circle>
+                    </svg>
+                    <div class="gauge__center">
+                      <span class="hero-aqi-number" id="aqiNumber" data-target="164">164</span>
+                      <span class="hero-aqi-unit">AQI · US</span>
+                    </div>
+                  </div>
                 </div>
+
                 <div class="hero-aqi-status-box">
-                  <span class="hero-status-caption">Air Quality is</span>
+                  <span class="hero-status-caption">Current Air Quality</span>
                   <div class="status-pill hero-status-pill" id="aqiPill">
                     <span class="dot"></span>
                     <span id="aqiLabel">Unhealthy</span>
+                  </div>
+                  <div class="hero-primary-pol">
+                    <span>Main Pollutant:</span> <strong id="aqiPrimary">PM2.5</strong>
                   </div>
                 </div>
               </div>
 
               <!-- Quick Pollutant Sub-metrics -->
-              <div class="hero-pollutants-row">
-                <span class="hero-pol-item"><strong>PM2.5 :</strong> <span id="heroPm25Val">78.4 µg/m³</span></span>
-                <span class="hero-pol-divider">|</span>
-                <span class="hero-pol-item"><strong>PM10 :</strong> <span id="heroPm10Val">96 µg/m³</span></span>
-                <span class="hero-pol-divider">|</span>
-                <span class="hero-pol-item"><strong>Primary :</strong> <span id="aqiPrimary">PM2.5</span></span>
+              <div class="hero-pollutants-row" id="heroPollutantsRow">
+                <div class="hero-pol-chip">
+                  <span class="pol-chip-label">PM2.5</span>
+                  <span class="pol-chip-val" id="heroPm25Val">78.4 µg/m³</span>
+                </div>
+                <div class="hero-pol-chip">
+                  <span class="pol-chip-label">PM10</span>
+                  <span class="pol-chip-val" id="heroPm10Val">96 µg/m³</span>
+                </div>
+                <div class="hero-pol-chip">
+                  <span class="pol-chip-label">NO₂</span>
+                  <span class="pol-chip-val" id="heroNo2Val">62 µg/m³</span>
+                </div>
+                <div class="hero-pol-chip">
+                  <span class="pol-chip-label">O₃</span>
+                  <span class="pol-chip-val" id="heroO3Val">118 µg/m³</span>
+                </div>
               </div>
 
               <!-- Continuous Color Spectrum Scale Bar -->
@@ -321,7 +349,7 @@
                       <span class="capsule-cond" id="wxCond">Hazy · Partly cloudy</span>
                     </div>
                   </div>
-                  <a class="capsule-link" href="#air-quality" title="View details" aria-label="View weather and pollutant details">
+                  <a class="capsule-link" href="#weather" title="View detailed weather" aria-label="View weather forecast">
                     <svg class="icon icon--sm"><use href="#i-share"/></svg>
                   </a>
                 </div>
@@ -345,6 +373,20 @@
                     <div>
                       <span class="metric-lbl">Feels Like</span>
                       <strong class="metric-val" id="wxFeels">29 °C</strong>
+                    </div>
+                  </div>
+                  <div class="capsule-metric-item">
+                    <svg class="icon icon--sm"><use href="#i-eye"/></svg>
+                    <div>
+                      <span class="metric-lbl">Visibility</span>
+                      <strong class="metric-val" id="wxVis">3.2 km</strong>
+                    </div>
+                  </div>
+                  <div class="capsule-metric-item">
+                    <svg class="icon icon--sm"><use href="#i-rain"/></svg>
+                    <div>
+                      <span class="metric-lbl">Rain Chance</span>
+                      <strong class="metric-val" id="wxRain">15 %</strong>
                     </div>
                   </div>
                 </div>
@@ -380,14 +422,155 @@
               <span id="locCountry">India</span>
               <span id="locRegion">National Capital Territory</span>
               <span id="locTime">—</span>
-              <span id="wxVis">3.2 km</span>
-              <span id="wxRain">15 %</span>
-              <div id="gauge">
-                <svg><circle id="gaugeValue" cx="100" cy="100" r="84"></circle></svg>
-              </div>
             </div>
           </article>
 
+        </section>
+
+        <!-- ============ WEATHER DASHBOARD ============ -->
+        <section class="section section--weather" id="weather" data-section data-title="Weather" aria-labelledby="wx-section-title">
+          <header class="section__head">
+            <div>
+              <h2 class="section__title" id="wx-section-title">Live Weather & Detailed Forecast</h2>
+              <p class="section__sub">Current atmospheric conditions, 24-hour hourly outlook, and 7-day extended forecast for <span id="wxSectionCity">New Delhi</span>.</p>
+            </div>
+            <span class="tag tag--sample" data-source-tag>Sample data</span>
+          </header>
+
+          <!-- Weather Dashboard Layout -->
+          <div class="weather-dashboard-layout">
+            
+            <!-- Current Weather Overview Hero Card -->
+            <article class="card weather-card weather-overview-card" aria-labelledby="wxCardHead">
+              <div class="card__head card__head--wrap">
+                <div>
+                  <span class="weather-loc-badge" id="wxCardHead"><svg class="icon icon--sm"><use href="#i-pin"/></svg> <span id="wxLocationFull">New Delhi, India</span></span>
+                  <p class="card__sub" id="wxConditionSub">Observed conditions</p>
+                </div>
+                <span class="tag tag--live-pulse" id="wxStatusTag">Live telemetry</span>
+              </div>
+
+              <div class="weather-hero-row">
+                <div class="weather-hero-left">
+                  <div class="weather-temp-massive">
+                    <span id="weatherTempMain">29</span><span class="wx-deg-unit">°C</span>
+                  </div>
+                  <p class="weather-cond-badge" id="weatherCondMain">Hazy · Partly cloudy</p>
+                  <p class="weather-hl-text" id="wxHighLow">High: 32 °C · Low: 21 °C</p>
+                </div>
+                <div class="weather-hero-art">
+                  <div class="weather-art-icon" id="weatherArtWrap">
+                    <svg class="icon icon--xl" aria-hidden="true"><use id="weatherIconMain" href="#i-cloud"/></svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Comprehensive Weather Metrics Grid -->
+              <div class="wx-detail-grid">
+                <div class="wx-detail-item">
+                  <svg class="icon"><use href="#i-temp"/></svg>
+                  <div>
+                    <span class="wx-dt-label">Feels Like</span>
+                    <strong class="wx-dt-val" id="wxFeelsDetail">31 °C</strong>
+                  </div>
+                </div>
+                <div class="wx-detail-item">
+                  <svg class="icon"><use href="#i-drop"/></svg>
+                  <div>
+                    <span class="wx-dt-label">Humidity</span>
+                    <strong class="wx-dt-val" id="wxHumidityDetail">58 %</strong>
+                  </div>
+                </div>
+                <div class="wx-detail-item">
+                  <svg class="icon"><use href="#i-wind"/></svg>
+                  <div>
+                    <span class="wx-dt-label">Wind Speed</span>
+                    <strong class="wx-dt-val" id="wxWindDetail">9 km/h</strong>
+                  </div>
+                </div>
+                <div class="wx-detail-item">
+                  <svg class="icon"><use href="#i-eye"/></svg>
+                  <div>
+                    <span class="wx-dt-label">Visibility</span>
+                    <strong class="wx-dt-val" id="wxVisibilityDetail">3.2 km</strong>
+                  </div>
+                </div>
+                <div class="wx-detail-item">
+                  <svg class="icon"><use href="#i-rain"/></svg>
+                  <div>
+                    <span class="wx-dt-label">Precipitation</span>
+                    <strong class="wx-dt-val" id="wxRainDetail">15 %</strong>
+                  </div>
+                </div>
+                <div class="wx-detail-item">
+                  <svg class="icon"><use href="#i-target"/></svg>
+                  <div>
+                    <span class="wx-dt-label">Pressure</span>
+                    <strong class="wx-dt-val" id="wxPressureDetail">1013 hPa</strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sun Arc / Day Cycle -->
+              <div class="sun-cycle-card">
+                <div class="sun-point">
+                  <span class="sun-icon-box sun-rise-box"><svg class="icon"><use href="#i-sun"/></svg></span>
+                  <div>
+                    <span class="sun-meta-title">Sunrise</span>
+                    <strong class="sun-meta-time" id="wxSunriseTime">06:48 AM</strong>
+                  </div>
+                </div>
+                <div class="sun-arc-progress" aria-hidden="true">
+                  <div class="sun-track-bar">
+                    <span class="sun-orbit-dot" id="sunOrbitDot"></span>
+                  </div>
+                </div>
+                <div class="sun-point sun-point--right">
+                  <span class="sun-icon-box sun-set-box"><svg class="icon"><use href="#i-moon"/></svg></span>
+                  <div>
+                    <span class="sun-meta-title">Sunset</span>
+                    <strong class="sun-meta-time" id="wxSunsetTime">05:24 PM</strong>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- Forecast Stack: 24h Hourly & 7-Day Extended -->
+            <div class="weather-forecasts-stack">
+
+              <!-- Hourly Weather Forecast -->
+              <article class="card wx-forecast-card">
+                <div class="card__head card__head--wrap">
+                  <div>
+                    <h3 class="card__title">24-Hour Forecast</h3>
+                    <p class="card__sub">Hourly temperature, condition and rain chance</p>
+                  </div>
+                  <span class="tag tag--demo">Next 24h</span>
+                </div>
+                <div class="wx-hourly-scroll" id="wxHourlyScroll" role="region" aria-label="Hourly weather forecast" tabindex="0">
+                  <div class="wx-hourly-strip" id="wxHourlyStrip">
+                    <!-- Populated dynamically by script.js -->
+                  </div>
+                </div>
+              </article>
+
+              <!-- 7-Day Weather Forecast -->
+              <article class="card wx-weekly-card">
+                <div class="card__head card__head--wrap">
+                  <div>
+                    <h3 class="card__title">7-Day Outlook</h3>
+                    <p class="card__sub">Extended daily forecast and temperature ranges</p>
+                  </div>
+                  <span class="tag tag--demo">7 Days</span>
+                </div>
+                <div class="wx-weekly-list" id="wxWeeklyList" role="list">
+                  <!-- Populated dynamically by script.js -->
+                </div>
+              </article>
+
+            </div>
+
+          </div>
         </section>
 
         <!-- ============ AIR QUALITY ============ -->

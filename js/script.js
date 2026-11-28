@@ -240,7 +240,7 @@
 
     const [wx, wxFc, cur, hist, fc] = await Promise.all([
       owm("weather", Object.assign({ units: "metric" }, coords)),
-      owm("forecast", Object.assign({ units: "metric", cnt: 1 }, coords)).catch(() => null),
+      owm("forecast", Object.assign({ units: "metric", cnt: 24 }, coords)).catch(() => null),
       owm("air_pollution", coords),
       owm("air_pollution/history", Object.assign({ start: nowSec - 26 * 3600, end: nowSec }, coords)).catch(() => null),
       owm("air_pollution/forecast", coords).catch(() => null)
@@ -268,20 +268,131 @@
     const main = wx.main || {};
     const nextFc = wxFc && wxFc.list && wxFc.list[0];
     const rainChance = nextFc && nextFc.pop != null ? Math.round(nextFc.pop * 100) : null;
+
+    // Process hourly weather items from forecast
+    const tzOffset = wx.timezone || 0;
+    const weatherHourly = (wxFc && wxFc.list ? wxFc.list.slice(0, 8) : []).map((item) => {
+      const dt = new Date((item.dt + tzOffset) * 1000);
+      const h = dt.getUTCHours();
+      const timeStr = ((h + 11) % 12 + 1) + " " + (h >= 12 ? "PM" : "AM");
+      const iconKey = weatherIcon((item.weather && item.weather[0] && item.weather[0].main) || "Clear");
+      return {
+        time: timeStr,
+        temp: Math.round(item.main.temp),
+        icon: iconKey,
+        pop: item.pop != null ? Math.round(item.pop * 100) : 0,
+        desc: (item.weather && item.weather[0] && item.weather[0].description) || ""
+      };
+    });
+
+    // Process daily forecast items
+    const weatherWeekly = buildWeeklyForecastFromFc(wxFc, main.temp, tzOffset);
+
+    let sunriseStr = "06:48 AM";
+    let sunsetStr = "05:32 PM";
+    if (wx.sys && wx.sys.sunrise && wx.sys.sunset) {
+      const sRise = new Date((wx.sys.sunrise + tzOffset) * 1000);
+      const sSet = new Date((wx.sys.sunset + tzOffset) * 1000);
+      const rh = sRise.getUTCHours(), rm = sRise.getUTCMinutes();
+      const sh = sSet.getUTCHours(), sm = sSet.getUTCMinutes();
+      sunriseStr = String((rh + 11) % 12 + 1).padStart(2, "0") + ":" + String(rm).padStart(2, "0") + " " + (rh >= 12 ? "PM" : "AM");
+      sunsetStr = String((sh + 11) % 12 + 1).padStart(2, "0") + ":" + String(sm).padStart(2, "0") + " " + (sh >= 12 ? "PM" : "AM");
+    }
+
     return {
       source: "live",
-      tz: wx.timezone || 0,
+      tz: tzOffset,
       updated: new Date((wx.dt || nowSec) * 1000),
       aqi: calc.aqi, primary: calc.primary, subs: calc.subs, components,
       weather: {
         temp: main.temp, feels: main.feels_like, humidity: main.humidity,
+        pressure: main.pressure || 1013,
+        tempMin: main.temp_min != null ? main.temp_min : (main.temp - 5),
+        tempMax: main.temp_max != null ? main.temp_max : (main.temp + 4),
         wind: (wx.wind && wx.wind.speed != null ? wx.wind.speed : 0) * 3.6,   // m/s -> km/h
         visibility: wx.visibility != null ? wx.visibility / 1000 : null,       // m -> km
         rainChance,
-        main: w.main || "", desc: w.description || ""
+        sunriseStr, sunsetStr,
+        main: w.main || "", desc: w.description || "",
+        hourly: weatherHourly.length ? weatherHourly : generateSampleWeatherHourly(main.temp),
+        weekly: weatherWeekly.length ? weatherWeekly : generateSampleWeatherWeekly(main.temp)
       },
       hourly, forecast
     };
+  }
+
+  function generateSampleWeatherHourly(baseTemp) {
+    const hours = ["12 AM", "3 AM", "6 AM", "9 AM", "12 PM", "3 PM", "6 PM", "9 PM"];
+    const tempOffsets = [-4, -5, -3, 1, 4, 3, 0, -2];
+    const icons = ["i-moon", "i-moon", "i-sun", "i-sun", "i-cloud", "i-sun", "i-cloud", "i-moon"];
+    const pops = [5, 5, 10, 15, 20, 15, 10, 5];
+    return hours.map((h, i) => ({
+      time: h,
+      temp: Math.round(baseTemp + tempOffsets[i]),
+      icon: icons[i],
+      pop: pops[i],
+      desc: i === 4 ? "Partly cloudy" : "Clear"
+    }));
+  }
+
+  function generateSampleWeatherWeekly(baseTemp) {
+    const days = ["Today", "Tomorrow", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const conds = ["Partly cloudy", "Hazy sun", "Mostly sunny", "Sunny & clear", "Scattered clouds", "Passing shower", "Clear"];
+    const icons = ["i-cloud", "i-sun", "i-sun", "i-sun", "i-cloud", "i-drop", "i-sun"];
+    const rain = [15, 10, 5, 0, 20, 45, 10];
+    const minDeltas = [-6, -7, -5, -6, -4, -5, -6];
+    const maxDeltas = [3, 4, 3, 5, 2, 1, 3];
+    return days.map((day, i) => ({
+      day,
+      cond: conds[i],
+      icon: icons[i],
+      rain: rain[i],
+      min: Math.round(baseTemp + minDeltas[i]),
+      max: Math.round(baseTemp + maxDeltas[i])
+    }));
+  }
+
+  function buildWeeklyForecastFromFc(wxFc, baseTemp, tzOffset) {
+    if (!wxFc || !Array.isArray(wxFc.list) || !wxFc.list.length) {
+      return generateSampleWeatherWeekly(baseTemp);
+    }
+    const daysMap = new Map();
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    wxFc.list.forEach((item) => {
+      const dt = new Date((item.dt + tzOffset) * 1000);
+      const dayKey = dt.toISOString().slice(0, 10);
+      const dayName = dayNames[dt.getUTCDay()];
+      if (!daysMap.has(dayKey)) {
+        daysMap.set(dayKey, {
+          day: dayName,
+          temps: [],
+          pops: [],
+          main: item.weather && item.weather[0] ? item.weather[0].main : "Clear",
+          desc: item.weather && item.weather[0] ? item.weather[0].description : "Clear"
+        });
+      }
+      const dObj = daysMap.get(dayKey);
+      dObj.temps.push(item.main.temp);
+      if (item.pop != null) dObj.pops.push(item.pop * 100);
+    });
+    const result = [];
+    let idx = 0;
+    for (const [, val] of daysMap) {
+      if (idx >= 7) break;
+      const min = Math.round(Math.min.apply(null, val.temps));
+      const max = Math.round(Math.max.apply(null, val.temps));
+      const popAvg = val.pops.length ? Math.round(val.pops.reduce((a, b) => a + b, 0) / val.pops.length) : 0;
+      result.push({
+        day: idx === 0 ? "Today" : idx === 1 ? "Tomorrow" : val.day,
+        cond: cap(val.desc),
+        icon: weatherIcon(val.main),
+        rain: popAvg,
+        min,
+        max
+      });
+      idx++;
+    }
+    return result.length ? result : generateSampleWeatherWeekly(baseTemp);
   }
 
   const CITY_PROFILES = {
@@ -342,12 +453,19 @@
     const wx = {
       temp: prof.temp,
       feels: prof.temp + 1,
+      tempMin: prof.temp - 5,
+      tempMax: prof.temp + 4,
       humidity: prof.humidity,
+      pressure: 1014,
       wind: prof.wind,
       visibility: prof.aqi > 200 ? 2.5 : 8.0,
-      rainChance: 10,
+      rainChance: 12,
+      sunriseStr: "06:48 AM",
+      sunsetStr: "05:32 PM",
       main: prof.aqi > 150 ? "Haze" : "Clear",
-      desc: prof.cond
+      desc: prof.cond,
+      hourly: generateSampleWeatherHourly(prof.temp),
+      weekly: generateSampleWeatherWeekly(prof.temp)
     };
 
     return {
@@ -562,14 +680,116 @@
   function renderWeather() {
     const w = state.data.weather;
     const r = (n) => (n == null || Number.isNaN(n) ? "—" : String(Math.round(n)));
-    $("#wxTemp").textContent = r(w.temp);
-    $("#wxCond").textContent = cap(w.desc);
-    $("#wxFeels").textContent = r(w.feels) + " °C";
-    $("#wxHum").textContent = r(w.humidity) + " %";
-    $("#wxWind").textContent = r(w.wind) + " km/h";
-    $("#wxVis").textContent = w.visibility == null ? "—" : (w.visibility >= 10 ? "10+" : w.visibility.toFixed(1)) + " km";
-    $("#wxRain").textContent = w.rainChance == null || Number.isNaN(w.rainChance) ? "—" : Math.round(w.rainChance) + " %";
-    $("#wxIconUse").setAttribute("href", "#" + weatherIcon(w.main));
+
+    // Hero capsule elements (preserved)
+    if ($("#wxTemp")) $("#wxTemp").textContent = r(w.temp);
+    if ($("#wxCond")) $("#wxCond").textContent = cap(w.desc);
+    if ($("#wxFeels")) $("#wxFeels").textContent = r(w.feels) + " °C";
+    if ($("#wxHum")) $("#wxHum").textContent = r(w.humidity) + " %";
+    if ($("#wxWind")) $("#wxWind").textContent = r(w.wind) + " km/h";
+    if ($("#wxVis")) $("#wxVis").textContent = w.visibility == null ? "—" : (w.visibility >= 10 ? "10+" : w.visibility.toFixed(1)) + " km";
+    if ($("#wxRain")) $("#wxRain").textContent = w.rainChance == null || Number.isNaN(w.rainChance) ? "—" : Math.round(w.rainChance) + " %";
+    if ($("#wxIconUse")) $("#wxIconUse").setAttribute("href", "#" + weatherIcon(w.main));
+
+    // Detailed Weather Dashboard elements
+    if ($("#weatherTempMain")) $("#weatherTempMain").textContent = r(w.temp);
+    if ($("#weatherCondMain")) $("#weatherCondMain").textContent = cap(w.desc);
+    if ($("#weatherIconMain")) $("#weatherIconMain").setAttribute("href", "#" + weatherIcon(w.main));
+    if ($("#wxSectionCity")) $("#wxSectionCity").textContent = state.city.city;
+    if ($("#wxLocationFull")) $("#wxLocationFull").textContent = state.city.city + (state.city.country ? ", " + state.city.country : "");
+    if ($("#wxHighLow")) $("#wxHighLow").textContent = "High: " + r(w.tempMax != null ? w.tempMax : (w.temp + 4)) + " °C · Low: " + r(w.tempMin != null ? w.tempMin : (w.temp - 5)) + " °C";
+
+    if ($("#wxFeelsDetail")) $("#wxFeelsDetail").textContent = r(w.feels) + " °C";
+    if ($("#wxHumidityDetail")) $("#wxHumidityDetail").textContent = r(w.humidity) + " %";
+    if ($("#wxWindDetail")) $("#wxWindDetail").textContent = r(w.wind) + " km/h";
+    if ($("#wxVisibilityDetail")) $("#wxVisibilityDetail").textContent = w.visibility == null ? "—" : (w.visibility >= 10 ? "10+" : w.visibility.toFixed(1)) + " km";
+    if ($("#wxRainDetail")) $("#wxRainDetail").textContent = (w.rainChance == null || Number.isNaN(w.rainChance) ? "0" : Math.round(w.rainChance)) + " %";
+    if ($("#wxPressureDetail")) $("#wxPressureDetail").textContent = (w.pressure || 1013) + " hPa";
+
+    if ($("#wxSunriseTime")) $("#wxSunriseTime").textContent = w.sunriseStr || "06:48 AM";
+    if ($("#wxSunsetTime")) $("#wxSunsetTime").textContent = w.sunsetStr || "05:32 PM";
+
+    // Sun progress indicator
+    const orbitDot = $("#sunOrbitDot");
+    if (orbitDot) {
+      const nowH = new Date().getHours() + new Date().getMinutes() / 60;
+      const progress = Math.max(5, Math.min(95, Math.round(((nowH - 6) / 12) * 100)));
+      orbitDot.style.left = progress + "%";
+    }
+
+    // Secondary hero pollutant chips
+    if ($("#heroNo2Val") && state.data.components && state.data.components.no2 != null) {
+      $("#heroNo2Val").textContent = Math.round(state.data.components.no2) + " µg/m³";
+    }
+    if ($("#heroO3Val") && state.data.components && state.data.components.o3 != null) {
+      $("#heroO3Val").textContent = Math.round(state.data.components.o3) + " µg/m³";
+    }
+    if ($("#stationName")) {
+      $("#stationName").textContent = "CAAQMS Station · " + state.city.city;
+    }
+
+    // Render 24h Hourly Weather Strip
+    renderHourlyWeather(w.hourly || []);
+
+    // Render 7-Day Extended Forecast List
+    renderWeeklyWeather(w.weekly || []);
+  }
+
+  function renderHourlyWeather(items) {
+    const strip = $("#wxHourlyStrip");
+    if (!strip) return;
+    strip.textContent = "";
+    items.forEach((item, idx) => {
+      const card = el("div", "wx-hour-card" + (idx === 0 ? " is-now" : ""));
+      const time = el("span", "wx-hour-time", idx === 0 ? "Now" : item.time);
+      const iconWrap = el("span", "wx-hour-icon");
+      iconWrap.innerHTML = iconSvg(item.icon);
+      const temp = el("strong", "wx-hour-temp", item.temp + "°");
+      card.append(time, iconWrap, temp);
+      if (item.pop > 0) {
+        const pop = el("span", "wx-hour-pop", item.pop + "%");
+        card.append(pop);
+      }
+      strip.append(card);
+    });
+  }
+
+  function renderWeeklyWeather(items) {
+    const list = $("#wxWeeklyList");
+    if (!list) return;
+    list.textContent = "";
+    if (!items.length) return;
+    const globalMin = Math.min.apply(null, items.map((i) => i.min));
+    const globalMax = Math.max.apply(null, items.map((i) => i.max));
+    const span = Math.max(1, globalMax - globalMin);
+
+    items.forEach((item) => {
+      const row = el("div", "wx-day-row");
+      const day = el("span", "wx-day-name", item.day);
+      const iconWrap = el("span", "wx-day-icon");
+      iconWrap.innerHTML = iconSvg(item.icon);
+      const cond = el("span", "wx-day-cond", item.cond);
+
+      const popWrap = el("span", "wx-day-pop");
+      if (item.rain > 0) {
+        popWrap.innerHTML = iconSvg("i-drop") + "<span>" + item.rain + "%</span>";
+      }
+
+      const tempRange = el("div", "wx-day-range");
+      const minEl = el("span", "wx-day-min", item.min + "°");
+      const bar = el("div", "wx-range-bar");
+      const fill = el("span", "wx-range-fill");
+      const leftPct = Math.round(((item.min - globalMin) / span) * 100);
+      const widthPct = Math.max(12, Math.round(((item.max - item.min) / span) * 100));
+      fill.style.left = leftPct + "%";
+      fill.style.width = widthPct + "%";
+      bar.append(fill);
+      const maxEl = el("span", "wx-day-max", item.max + "°");
+      tempRange.append(minEl, bar, maxEl);
+
+      row.append(day, iconWrap, cond, popWrap, tempRange);
+      list.append(row);
+    });
   }
 
   /* ---- Pollutants ---- */
@@ -641,7 +861,10 @@
     [1, 0.75, 0.5, 0.25, 0].forEach((f) => y.append(el("span", "", String(Math.round(yMax * f)))));
     plot.append(y);
 
-    const labelEvery = state.chart.range > 12 ? 3 : state.chart.range > 6 ? 2 : 1;
+    const isMobile = window.innerWidth <= 480;
+    const labelEvery = isMobile
+      ? (state.chart.range > 12 ? 6 : state.chart.range > 6 ? 3 : 2)
+      : (state.chart.range > 12 ? 3 : state.chart.range > 6 ? 2 : 1);
 
     data.forEach((entry, i) => {
       const fromEnd = data.length - 1 - i;
@@ -701,8 +924,8 @@
     const colRect = col.getBoundingClientRect();
     const barH = parseFloat(col.firstElementChild.dataset.h) / 100;
     let x = colRect.left - wrapRect.left + colRect.width / 2;
-    const half = tip.offsetWidth / 2;
-    x = Math.max(half + 4, Math.min(wrapRect.width - half - 4, x));
+    const half = Math.max(tip.offsetWidth / 2, 60);
+    x = Math.max(half + 8, Math.min(wrapRect.width - half - 8, x));
     const yPos = colRect.bottom - wrapRect.top - colRect.height * barH - 10;
     tip.style.left = x + "px";
     tip.style.top = Math.max(tip.offsetHeight + 4, yPos) + "px";
@@ -723,6 +946,14 @@
       });
     });
     document.addEventListener("click", (e) => { if (!e.target.closest(".col")) hideTip(); });
+
+    let resizeTimer = null;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (state.data) renderChart();
+      }, 150);
+    }, { passive: true });
   }
 
   /* ---- Recommendations (rule-based on current AQI) ---- */
@@ -1504,8 +1735,8 @@
     const toggleWeather = $("#toggleWeatherView");
     if (toggleWeather) {
       toggleWeather.addEventListener("click", () => {
-        const capsule = $("#heroWeatherCapsule");
-        if (capsule) capsule.scrollIntoView({ behavior: "smooth", block: "center" });
+        const target = $("#weather") || $("#heroWeatherCapsule");
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
   }
