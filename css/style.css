@@ -2242,3 +2242,440 @@ main { padding: 0 var(--pad) 40px; outline: none; width: 100%; max-width: 1280px
 [data-theme="dark"] .wx-range-bar {
   background: rgba(148, 178, 220, 0.14);
 }
+
+/* ============================================================
+   ABOUT US SECTION
+   ============================================================ */
+.section--about {
+  margin-top: 1.5rem;
+}
+
+.about-card {
+  padding: 1.75rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.about-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.about-text {
+  font-size: 0.95rem;
+  line-height: 1.68;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+.about-features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.about-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1rem;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.about-feature-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(6, 182, 212, 0.35);
+}
+
+.about-feature-icon {
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 999px;
+  background: rgba(6, 182, 212, 0.12);
+  color: var(--cyan);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.about-feature-icon .icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.about-feature-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.about-feature-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.about-feature-desc {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+/* ============================================================
+   PREMIUM SITE FOOTER (3 COLUMNS)
+   ============================================================ */
+.site-footer {
+  margin-top: 3.5rem;
+  padding: 3rem 0 1.5rem;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  color: var(--text);
+  position: relative;
+}
+
+.site-footer__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.site-footer__grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.6fr;
+  gap: 3rem;
+}
+
+.site-footer__col {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Column 1: Brand */
+.site-footer__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.site-footer__brand .brand-icon {
+  width: 1.85rem;
+  height: 1.85rem;
+  color: var(--cyan);
+}
+
+.site-footer__brand .brand-name {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--text) 30%, var(--cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.site-footer__tagline {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--cyan);
+  margin: 0 0 0.65rem 0;
+}
+
+.site-footer__desc {
+  font-size: 0.86rem;
+  line-height: 1.62;
+  color: var(--text-dim);
+  margin: 0;
+  max-width: 440px;
+}
+
+/* Headings */
+.site-footer__heading {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  margin: 0 0 1.15rem 0;
+}
+
+/* Column 2: Navigation Links */
+.site-footer__nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.site-footer__nav-list li a.footer-link {
+  display: inline-block;
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  text-decoration: none;
+  transition: color 0.18s ease, transform 0.18s ease;
+  padding: 0.2rem 0;
+}
+
+.site-footer__nav-list li a.footer-link:hover,
+.site-footer__nav-list li a.footer-link:focus-visible {
+  color: var(--cyan);
+  transform: translateX(3px);
+}
+
+/* Column 3: Contact Cards with Real Icons */
+.site-footer__contacts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.contact-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  text-decoration: none;
+  color: var(--text);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  min-height: 48px;
+}
+
+.contact-card:hover,
+.contact-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(6, 182, 212, 0.4);
+  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.12);
+  background: rgba(6, 182, 212, 0.04);
+}
+
+.contact-icon {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.contact-card:hover .contact-icon {
+  transform: scale(1.08);
+}
+
+.contact-icon .icon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+/* Brand specific icon colors */
+.contact-icon--github {
+  background: rgba(148, 163, 184, 0.14);
+  color: var(--text);
+}
+
+.contact-icon--instagram {
+  background: linear-gradient(135deg, rgba(240, 148, 51, 0.18), rgba(220, 39, 67, 0.18), rgba(188, 24, 136, 0.18));
+  color: #e1306c;
+}
+
+.contact-icon--email {
+  background: rgba(2, 132, 199, 0.14);
+  color: #0284c7;
+}
+
+.contact-icon--whatsapp {
+  background: rgba(37, 211, 102, 0.14);
+  color: #25d366;
+}
+
+.contact-details {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  overflow: hidden;
+}
+
+.contact-platform {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.contact-value {
+  font-size: 0.76rem;
+  color: var(--text-mute);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.contact-card:hover .contact-value {
+  color: var(--cyan);
+}
+
+/* Bottom Copyright and Meta */
+.site-footer__bottom {
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.site-footer__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.site-footer__copy {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+.site-footer__motto {
+  font-size: 0.82rem;
+  color: var(--text-mute);
+  margin: 0;
+  font-style: italic;
+}
+
+.site-footer__note {
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: var(--text-mute);
+  margin: 0;
+  opacity: 0.85;
+}
+
+/* Dark Theme Adjustments for Footer & About */
+[data-theme="dark"] .about-card {
+  background: rgba(18, 25, 40, 0.85);
+  border-color: var(--line);
+  backdrop-filter: blur(12px);
+}
+
+[data-theme="dark"] .about-feature-item {
+  background: rgba(148, 178, 220, 0.05);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .about-feature-item:hover {
+  background: rgba(148, 178, 220, 0.08);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+[data-theme="dark"] .site-footer {
+  background: rgba(10, 15, 26, 0.92);
+  border-top-color: var(--line);
+  backdrop-filter: blur(14px);
+}
+
+[data-theme="dark"] .contact-card {
+  background: rgba(18, 25, 40, 0.7);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .contact-card:hover {
+  background: rgba(56, 189, 248, 0.08);
+  border-color: rgba(56, 189, 248, 0.5);
+}
+
+[data-theme="dark"] .contact-icon--github {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .contact-icon--instagram {
+  color: #ff608f;
+}
+
+[data-theme="dark"] .contact-icon--email {
+  color: #38bdf8;
+}
+
+[data-theme="dark"] .contact-icon--whatsapp {
+  color: #4ade80;
+}
+
+/* ============================================================
+   RESPONSIVE DESIGN FOR ABOUT & FOOTER
+   ============================================================ */
+@media (max-width: 960px) {
+  .about-features-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .site-footer__grid {
+    grid-template-columns: 1fr;
+    gap: 2.25rem;
+  }
+
+  .site-footer__desc {
+    max-width: 100%;
+  }
+
+  .site-footer__meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .about-card {
+    padding: 1.25rem;
+    gap: 1.25rem;
+  }
+
+  .about-text {
+    font-size: 0.88rem;
+  }
+
+  .site-footer {
+    padding: 2.25rem 0 1.25rem;
+  }
+
+  .site-footer__inner {
+    padding: 0 1rem;
+    gap: 2rem;
+  }
+
+  .contact-card {
+    padding: 0.55rem 0.75rem;
+  }
+
+  .contact-value {
+    font-size: 0.72rem;
+  }
+}

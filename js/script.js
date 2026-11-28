@@ -1540,8 +1540,12 @@
         if (txt) txt.textContent = busy ? "Locating…" : "Locate me";
       }
     }
-    track.addEventListener("click", () => {
-      if (!navigator.geolocation) { toast("Your browser does not support location. Search for your city instead."); return; }
+
+    async function requestUserLocation() {
+      if (!navigator.geolocation) {
+        toast("Your browser does not support location. Search for your city instead.");
+        return;
+      }
       setTrackBusy(true);
       navigator.geolocation.getCurrentPosition(async (pos) => {
         const lat = pos.coords.latitude, lon = pos.coords.longitude;
@@ -1568,7 +1572,11 @@
             }
           } catch (err2) { /* keep coordinate label */ }
         }
-        await choose(city);
+        try {
+          await choose(city);
+        } finally {
+          setTrackBusy(false);
+        }
       }, (err) => {
         setTrackBusy(false);
         const msg = err.code === 1
@@ -1578,7 +1586,16 @@
             : "Your location is not available right now. Search for your city instead.";
         toast(msg, 6500);
       }, { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 });
-    });
+    }
+
+    track.addEventListener("click", requestUserLocation);
+    const headerLocate = $("#headerLocateBtn");
+    if (headerLocate) {
+      headerLocate.addEventListener("click", (e) => {
+        e.stopPropagation();
+        requestUserLocation();
+      });
+    }
 
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -1803,13 +1820,6 @@
   }
 
   function initProDashboard() {
-    // Header "Locate me" button triggers the location tracker
-    const headerLocate = $("#headerLocateBtn");
-    const track = $("#trackBtn");
-    if (headerLocate && track) {
-      headerLocate.addEventListener("click", () => track.click());
-    }
-
     // Favorite button
     const favBtn = $("#favoriteBtn");
     if (favBtn) {
